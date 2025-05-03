@@ -4,10 +4,8 @@ import MainNavigation from './domains/UserInterface/components/Navigation/MainNa
 </script>
 
 <template>
-  <div class="container-fluid py-4 px-3 mx-auto">
-    <MainNavigation />
-    <RouterView />
-  </div>
+  <MainNavigation />
+  <RouterView />
 </template>
 
 <style lang="scss" scoped>

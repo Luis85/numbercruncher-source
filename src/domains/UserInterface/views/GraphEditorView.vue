@@ -14,6 +14,7 @@ import EditorToolbar from '@/domains/UserInterface/components/GraphEditor/Toolba
 import CustomSidebar from '../components/GraphEditor/Sidebar/CustomSidebar.vue'
 
 import { BasicNode } from '@/domains/GraphEditor/nodes/BasicNode'
+import { NoteNode } from '@/domains/GraphEditor/nodes/NoteNode'
 
 const baklava = useBaklava()
 const editor = baklava.editor
@@ -45,6 +46,7 @@ settings.contextMenu.additionalItems = [
 ]
 
 editor.registerNodeType(BasicNode, { category: 'Basics' })
+editor.registerNodeType(NoteNode, { category: 'Basics' })
 
 engine.hooks.gatherCalculationData.subscribe(token, () => {
   return { step: step }

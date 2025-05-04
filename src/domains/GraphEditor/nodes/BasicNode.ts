@@ -13,7 +13,7 @@ import SidebarComponents from "@/domains/UserInterface/components/GraphEditor/Si
 
 export const BasicNode = defineNode({
     type: 'BasicNode',
-    title: 'Basic Node',
+    title: '🧱Basic Node',
     inputs: {
       // ports to connect to
       parent: () => new NodeInterface<string | undefined>('Parent', undefined),

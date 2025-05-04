@@ -10,7 +10,6 @@ import MainNavigation from './domains/UserInterface/components/Navigation/MainNa
 
 <style lang="scss" scoped>
 @import './assets/bootstrap.scss';
-
 button {
   height: auto;
 }

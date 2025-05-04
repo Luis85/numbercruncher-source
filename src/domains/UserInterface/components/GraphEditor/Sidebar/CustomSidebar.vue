@@ -68,7 +68,7 @@ export default defineComponent({
 <template>
   <div ref="el" class="baklava-sidebar" :class="{ '--open': graph.sidebar.visible }" :style="styles">
       <div v-if="resizable" class="__resizer" @mousedown="startResize" ></div>
-      <button tabindex="-1" class="__close" @click="close">&times;</button>
+      <span class="__close" @click="close">&times;</span>
       <div class="__header">
           <div class="__node-name">
               <b>{{ node ? `${node.title}` : "" }}</b>
@@ -76,7 +76,7 @@ export default defineComponent({
       </div>
 
       <div v-if="node">
-        <p>ID: {{ `${node.id}` }}</p>
+        <p>Id: {{ `${node.id}` }}</p>
       </div>
 
       <div v-for="intf in displayedInterfaces" :key="intf.id" class="__interface">
@@ -91,6 +91,7 @@ export default defineComponent({
 }
 .baklava-sidebar.--open {
   box-shadow: none;
+  padding: 0 1em 1em 1em
 }
 .baklava-sidebar .__header .__node-name {
   margin-left: 0;

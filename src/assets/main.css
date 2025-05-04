@@ -1,4 +1,5 @@
 @import './base.css';
+@import '@vueform/vueform/dist/vueform.css';
 
 .numbercruncher a,
 .numbercruncher .green {

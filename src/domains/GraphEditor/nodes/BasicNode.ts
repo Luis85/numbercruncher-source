@@ -1,7 +1,7 @@
 
 import { markRaw } from "vue";
 import { toPascalCase } from "@/utils/toPascalCase";
-import { defineNode, NodeInterface, allowMultipleConnections, displayInSidebar, SelectInterface, AbstractNode, NumberInterface } from "baklavajs";
+import { defineDynamicNode, NodeInterface, allowMultipleConnections, displayInSidebar, SelectInterface, AbstractNode, NumberInterface, TextInputInterface } from "baklavajs";
 import { BASIC_NODE_EMPTY_STATE, BASIC_NODE_TYPES, type BasicNodeInterface, type NodeOptionConfiguration, type NodeOutput } from "..";
 
 import BasicNodeRenderer from "@/domains/UserInterface/components/GraphEditor/Node/BasicNode.vue";
@@ -11,11 +11,12 @@ import SidebarOptions from "@/domains/UserInterface/components/GraphEditor/Sideb
 import SidebarColor from "@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarColor.vue";
 import SidebarComponents from "@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarComponents.vue";
 
-export const BasicNode = defineNode({
+export const BasicNode = defineDynamicNode({
     type: 'BasicNode',
     title: '🧱Basic Node',
+    // static interfaces
     inputs: {
-      // ports to connect to
+      // ports for other nodes to connect to
       parent: () => new NodeInterface<string | undefined>('Parent', undefined),
       inputs: () => new NodeInterface<NodeOutput[]>('Inputs', []).use(allowMultipleConnections),
 
@@ -43,6 +44,45 @@ export const BasicNode = defineNode({
       outputs: () => new NodeInterface<NodeOutput | undefined>("Outputs", undefined),
     },
 
+    onUpdate(inputs) {
+      const dynamic: Record<string, () => TextInputInterface | NumberInterface | SelectInterface> = {}
+
+      for(const option of inputs.options) {
+        if(!option.type || !option.name) continue
+
+        const key = option.name
+        const def = option.value
+
+        switch (option.type) {
+          case 'string':
+            dynamic[key] = () =>
+              new TextInputInterface(key, typeof def === 'string' ? def : '').setPort(false)
+            break
+
+          case 'number':
+            dynamic[key] = () =>
+              new NumberInterface(key, typeof def === 'number' ? def : 0).setPort(false)
+            break
+
+          case 'boolean':
+            dynamic[key] = () =>
+              new SelectInterface(key, String(def || false), ['true','false']).setPort(false)
+            break
+
+          case 'list':
+            dynamic[key] = () =>
+              new SelectInterface(key, String(def ?? ''), []).setPort(false)
+            break
+
+          default:
+            // Fallback: rudimentärer String-Editor
+            dynamic[key] = () => new TextInputInterface(key, String(def ?? '')).setPort(false)
+        }
+      }
+
+      return { inputs: dynamic }
+    },
+
     calculate(inputs, { globalValues }) {
       const node = this as unknown as AbstractNode
       const { step } = globalValues as { step: number }
@@ -53,8 +93,8 @@ export const BasicNode = defineNode({
       inputs.view.name = toPascalCase(node.title)
       inputs.view.step = step
 
-      // feed the viewmodel for the next step with the user input
-      inputs.view.type = inputs.type
+      // feed the viewmodel for the next step with the user input from static inputs
+      inputs.view.type = toPascalCase(inputs.type)
       inputs.view.color = inputs.color
       inputs.view.width = inputs.width
       inputs.view.height = inputs.height
@@ -64,6 +104,7 @@ export const BasicNode = defineNode({
       inputs.view.tags = inputs.tags
       inputs.view.components = inputs.components
       inputs.view.options = inputs.options
+      inputs.view.actions = inputs.actions
 
       // prepare outputs
       const outputs = {

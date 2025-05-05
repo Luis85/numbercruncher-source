@@ -1,46 +1,48 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { BASIC_NODE_TAGS } from '@/domains/GraphEditor'
+import { computed, onMounted, ref, watch } from 'vue'
+import type { BasicNode as BasicNodeNodeConstructor } from '@/domains/GraphEditor/nodes/BasicNode'
+import { BASIC_NODE_TAGS, type BasicNodeInterface } from '@/domains/GraphEditor'
+import type { NodeInterface } from 'baklavajs';
+type BasicNode = InstanceType<typeof BasicNodeNodeConstructor>
 
 // Props & Emits
 const props = defineProps<{
   modelValue: string[]
-  node?: unknown
-  intf?: unknown
+  node: BasicNode
+  intf: NodeInterface<BasicNodeInterface>
 }>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string[]): void
+  (e: 'openSidebar'): void
 }>()
 
-// Computed-Proxy für das ganze Form-Objekt
-const data = computed< { tags: string[] } >({
-  get() {
-    // Vueform liest data.tags → hier kommen deine aktuellen Tags
-    return { tags: props.modelValue }
+const state = ref<{ tags: string[] }>({ tags: [...props.modelValue] })
+
+watch(
+  () => state.value,
+  (newState) => {
+    emit('update:modelValue', [...newState.tags])
   },
-  set(newData) {
-    // Vueform schreibt das gesamte Form-Objekt zurück → wir nehmen nur newData.tags
-    // und emittieren sofort das Update:
-    emit('update:modelValue', [...newData.tags])
-  }
+  {deep: true}
+)
+
+onMounted(() => {
+  state.value.tags = [...props.node.inputs.tags.value]
 })
 
 // Die Options-Liste enthält immer die Defaults + bereits gewählte Tags
 const options = computed(() => {
-  const s = new Set<string>([...BASIC_NODE_TAGS, ...data.value.tags])
-  return Array.from(s)
+  return [...BASIC_NODE_TAGS, ...state.value.tags]
 })
 </script>
 
 <template>
   <p class="mb-0"><strong>Tags</strong></p>
-  <Vueform
-    v-model="data"
-    :endpoint="false"
-  >
+  <Vueform v-model="state" sync :endpoint="false" >
     <TagsElement
       name="tags"
+      :native="false"
       :create="true"
       :items="options"
     />

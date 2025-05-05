@@ -1,19 +1,32 @@
+
 export interface BasicNodeInterface {
   type: string
   name: string
   title: string
-  inputs: NodeOutput[]
-  outputs?: NodeOutput
-  tags: string[]
-  options: NodeOptionConfiguration[]
-  components: string[]
   step: number
   width: number
   height: number
   scale: number
+
+  options: NodeOptionConfiguration[]
+  tags: string[]
+  actions: string[]
+  components: string[]
+  inputs: NodeOutput[]
+
   id?: string
   parent?: string
   color?: string
+  outputs?: NodeOutput
+
+  [key: string]: string
+    | number
+    | boolean
+    | NodeOutput
+    | string[]
+    | NodeOutput[]
+    | NodeOptionConfiguration[]
+    | undefined
 }
 export interface NodeOutput {
   type: string
@@ -30,12 +43,12 @@ export interface NodeStatistics extends NodeInput {
   name: 'inputCount' | 'size'
   value: number | undefined
 }
-
 export interface NodeOptionConfiguration {
-  type: string
-  name: string
-  value: string | number | boolean | undefined
+  type?: string
+  name?: string
+  value?: string | number | boolean
 }
+
 
 export const BASIC_NODE_TYPES = ['BasicNode']
 export const BASIC_NODE_TAGS = ['Actor', 'Scene', 'Component', 'System', 'Supplier', 'Consumer', 'Emitter', 'Subscriber', 'Entity', 'Agent', 'Output', 'Outcome']
@@ -49,6 +62,7 @@ export const BASIC_NODE_EMPTY_STATE: BasicNodeInterface = {
   tags: [],
   options: [],
   components: [],
+  actions: [],
   inputs: [],
   step: 0,
   width: 0,

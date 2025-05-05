@@ -1,44 +1,45 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { BASIC_NODE_ACTIONS } from '@/domains/GraphEditor'
+import { computed, onMounted, ref, watch } from 'vue'
+import { BASIC_NODE_ACTIONS, type BasicNodeInterface } from '@/domains/GraphEditor'
+import type { BasicNode as BasicNodeNodeConstructor } from '@/domains/GraphEditor/nodes/BasicNode'
+import type { NodeInterface } from 'baklavajs';
+type BasicNode = InstanceType<typeof BasicNodeNodeConstructor>
 
 // Props & Emits
 const props = defineProps<{
   modelValue: string[]
-  node?: unknown
-  intf?: unknown
+  node: BasicNode
+  intf: NodeInterface<BasicNodeInterface>
 }>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string[]): void
 }>()
 
-// Computed-Proxy für das ganze Form-Objekt
-const data = computed< { actions: string[] } >({
-  get() {
-    // Vueform liest data.tags → hier kommen deine aktuellen actions
-    return { actions: props.modelValue }
+const state = ref<{ actions: string[] }>({ actions: [...props.modelValue] })
+
+watch(
+  () => state.value,
+  (newState) => {
+    emit('update:modelValue', [...newState.actions])
   },
-  set(newData) {
-    // Vueform schreibt das gesamte Form-Objekt zurück → wir nehmen nur newData.actions
-    // und emittieren sofort das Update:
-    emit('update:modelValue', [...newData.actions])
-  }
+  {deep: true}
+)
+
+onMounted(() => {
+  state.value.actions = [...props.node.inputs.actions.value]
 })
 
 // Die Options-Liste enthält immer die Defaults + bereits gewählte actions
 const options = computed(() => {
-  const s = new Set<string>([...BASIC_NODE_ACTIONS, ...data.value.actions])
-  return Array.from(s)
+  return [...BASIC_NODE_ACTIONS, ...state.value.actions]
 })
+
 </script>
 
 <template>
   <p class="mb-0"><strong>Actions</strong></p>
-  <Vueform
-    v-model="data"
-    :endpoint="false"
-  >
+  <Vueform v-model="state" sync v:endpoint="false" >
     <TagsElement
       name="actions"
       :create="true"

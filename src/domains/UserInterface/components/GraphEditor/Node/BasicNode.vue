@@ -25,9 +25,9 @@ function processInputs(newInputs: NodeOutput[]) {
   const size = newInputs.length + 1 + (state.value.parent ? 1 : 0)
   let complexity = 0
   for(const node of newInputs) {
+    if(!node) continue
     const metric = node.values.find( item => item.type === 'NodeStatistics' && item.name === 'complexity')
     if(!metric) continue
-
     complexity += Number(metric.value)
   }
 
@@ -49,7 +49,7 @@ function processInputs(newInputs: NodeOutput[]) {
       {
         type: 'NodeStatistics',
         name: 'complexity',
-        value: complexity + size
+        value: complexity
       },
     ] as NodeStatistics[]
   }
@@ -69,7 +69,6 @@ watch(
   () => props.modelValue.inputs,
   (newInputs) => processInputs(newInputs),
 )
-
 
 </script>
 

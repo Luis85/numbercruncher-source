@@ -1,96 +1,97 @@
 <script setup lang="ts">
-import type { NodeOptionConfiguration } from '@/domains/GraphEditor';
-import { ref } from 'vue';
+import { ref, watch } from 'vue'
+import type { NodeOptionConfiguration } from '@/domains/GraphEditor'
 
-interface MatrixRow {
-  type: 'string' | 'number' | 'boolean' | 'list' | null
-  name: string | null
-  value: string | null
-}
-
-interface OptionsData {
-  matrix: MatrixRow[]
-}
-
-defineProps<{
+// Props & Emits
+const props = defineProps<{
   modelValue: NodeOptionConfiguration[]
-  node?: unknown
-  intf?: unknown
 }>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: NodeOptionConfiguration[]): void
 }>()
 
-const data = ref<OptionsData>({ matrix: [] })
+const options = ref<NodeOptionConfiguration[]>([...props.modelValue])
 
-function processForm() {
-  const options: NodeOptionConfiguration[] = []
-  for(const option of data.value.matrix) {
-    if(!option.type || !option.name) return
-    options.push({
-      type: option.type,
-      name: option.name,
-      value: option.value ?? undefined
-    })
-  }
-  emit('update:modelValue', options)
+// When parent changes (e.g. on load), sync in
+watch(
+  () => options.value,
+  val => {
+    emit('update:modelValue', [...val])
+  },
+  { deep: true }
+)
+
+// Methods to add/remove
+function add() {
+  options.value.push({ type: '', name: '', value: '' })
 }
 
+function remove(index: number) {
+  options.value.splice(index, 1)
+}
 </script>
 
 <template>
-  <p class="mb-0"><strong>Options</strong></p>
-  <Vueform v-model="data" :endpoint="false" @updated="processForm">
-    <MatrixElement
-      name="matrix"
-      :cols="[
-        {
-          label: 'Type',
-          value: 'type',
-          inputType: {
-            type: 'select',
-          },
-          items: [
-            {
-              label: 'Text',
-              value: 'string',
-            },
-            {
-              label: 'Number',
-              value: 'number',
-            },
-            {
-              label: 'Boolean',
-              value: 'boolean',
-            },
-            {
-              label: 'List',
-              value: 'list',
-            },
-          ],
-        },
-        {
-          label: 'Name',
-          value: 'name',
-          inputType: {
-            type: 'text',
-          },
-        },
-        {
-          label: 'Value',
-          value: 'value',
-          inputType: {
-            type: 'text',
-          },
-        },
-      ]"
-    />
-  </Vueform>
+  <div class="sidebar-options">
+    <p><strong>Options</strong></p>>
+    <ul class="options-list">
+      <li v-for="(opt, idx) in options" :key="idx" class="option-row">
+        <select v-model="opt.type" class="opt-type">
+          <option disabled value="">-- type --</option>
+          <option value="string">Text</option>
+          <option value="number">Number</option>
+          <option value="boolean">Boolean</option>
+          <option value="list">List</option>
+        </select>
+        <input
+          v-model="opt.name"
+          class="opt-name"
+          type="text"
+          placeholder="Name"
+        />
+        <input
+          v-model="opt.value"
+          class="opt-value"
+          type="text"
+          placeholder="Value"
+        />
+        <button @click="remove(idx)" class="btn-remove">✕</button>
+      </li>
+    </ul>
+    <button @click="add()" class="btn-add">+ Add Option</button>
+  </div>
 </template>
 
-<style>
-.numbercruncher .vf-matrix-header {
-  justify-content: left;
+<style scoped>
+
+.options-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.option-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2px;
+}
+.opt-name {
+  flex: 1;
+}
+.opt-value {
+  flex: 1;
+}
+.btn-remove {
+  background: transparent;
+  border: none;
+  color: #c00;
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+.btn-remove:hover {
+  color: #f00;
+}
+.btn-add {
+  cursor: pointer;
 }
 </style>

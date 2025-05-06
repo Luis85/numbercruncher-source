@@ -38,5 +38,4 @@ export class ObsidianMainView extends ItemView {
   async onClose() {
     this.vue.unmount()
   }
-
 }

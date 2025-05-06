@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import type { BasicNode as BasicNodeNodeConstructor } from '@/domains/GraphEditor/nodes/BasicNode'
-import { BASIC_NODE_TAGS, type BasicNodeInterface } from '@/domains/GraphEditor'
+import { BASIC_NODE_EVENTS, type BasicNodeInterface } from '@/domains/GraphEditor'
 import type { NodeInterface } from 'baklavajs'
 type BasicNode = InstanceType<typeof BasicNodeNodeConstructor>
 
@@ -17,29 +17,29 @@ const emit = defineEmits<{
   (e: 'openSidebar'): void
 }>()
 
-const state = ref<{ tags: string[] }>({ tags: [...props.modelValue] })
+const state = ref<{ emits: string[] }>({ emits: [...props.modelValue] })
 
 watch(
   () => state.value,
   (newState) => {
-    emit('update:modelValue', [...newState.tags])
+    emit('update:modelValue', [...newState.emits])
   },
   { deep: true },
 )
 
 onMounted(() => {
-  state.value.tags = [...props.node.inputs.tags.value]
+  state.value.emits = [...props.node.inputs.emits.value]
 })
 
-// Die Options-Liste enthält immer die Defaults + bereits gewählte Tags
+// Die Options-Liste enthält immer die Defaults + bereits gewählte Events
 const options = computed(() => {
-  return [...BASIC_NODE_TAGS, ...state.value.tags]
+  return [...BASIC_NODE_EVENTS, ...state.value.emits]
 })
 </script>
 
 <template>
-  <p class="mb-0"><strong>Tags</strong></p>
+  <p class="mb-0"><strong>Emitted Events</strong></p>
   <Vueform v-model="state" sync :endpoint="false">
-    <TagsElement name="tags" :native="false" :create="true" :items="options" />
+    <TagsElement name="emits" :native="false" :create="true" :items="options" />
   </Vueform>
 </template>

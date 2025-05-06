@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import MainNavigation from './domains/UserInterface/components/Navigation/MainNavigation.vue';
+import MainNavigation from './domains/UserInterface/components/Navigation/MainNavigation.vue'
 </script>
 
 <template>
@@ -14,4 +14,3 @@ button {
   height: auto;
 }
 </style>
-

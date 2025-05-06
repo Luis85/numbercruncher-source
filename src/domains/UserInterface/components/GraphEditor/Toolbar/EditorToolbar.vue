@@ -45,7 +45,6 @@ export default defineComponent({
 
 <template>
   <div class="baklava-toolbar" @contextmenu.stop.prevent="">
-
     <toolbar-button
       v-for="c in commands"
       :key="c.command"

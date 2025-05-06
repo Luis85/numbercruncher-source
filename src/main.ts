@@ -1,13 +1,12 @@
-
 import './assets/main.css'
 
-import { Plugin, Notice, type WorkspaceLeaf } from "obsidian";
-import { type ObsidianPluginSettings, DEFAULT_SETTINGS } from './domains/Obsidian/settings';
-import { ObsidianPluginSettingTab } from './domains/Obsidian/settings/ObsidianPluginSettingTab';
-import { ObsidianMainView, VIEW_TYPE_MAIN } from './domains/Obsidian/views/ObsidianMainView';
+import { Plugin, Notice, type WorkspaceLeaf } from 'obsidian'
+import { type ObsidianPluginSettings, DEFAULT_SETTINGS } from './domains/Obsidian/settings'
+import { ObsidianPluginSettingTab } from './domains/Obsidian/settings/ObsidianPluginSettingTab'
+import { ObsidianMainView, VIEW_TYPE_MAIN } from './domains/Obsidian/views/ObsidianMainView'
 
 export default class ObsidianPlugin extends Plugin {
-  public settings:  ObsidianPluginSettings | undefined
+  public settings: ObsidianPluginSettings | undefined
 
   public async onload(): Promise<void> {
     document.body.classList.add('numbercruncher')

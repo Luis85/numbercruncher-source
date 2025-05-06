@@ -11,20 +11,20 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: NodeOptionConfiguration[]): void
 }>()
 
-const options = ref<NodeOptionConfiguration[]>([...props.modelValue])
+const options = ref<NodeOptionConfiguration[]>(props.modelValue)
 
 // When parent changes (e.g. on load), sync in
 watch(
   () => options.value,
-  val => {
-    emit('update:modelValue', [...val])
+  (options) => {
+    emit('update:modelValue', options)
   },
-  { deep: true }
+  { deep: true },
 )
 
 // Methods to add/remove
 function add() {
-  options.value.push({ type: '', name: '', value: '' })
+  options.value.push({ type: '', name: '', default: '' })
 }
 
 function remove(index: number) {
@@ -34,7 +34,7 @@ function remove(index: number) {
 
 <template>
   <div class="sidebar-options">
-    <p><strong>Options</strong></p>>
+    <p><strong>Options</strong></p>
     <ul class="options-list">
       <li v-for="(opt, idx) in options" :key="idx" class="option-row">
         <select v-model="opt.type" class="opt-type">
@@ -44,18 +44,8 @@ function remove(index: number) {
           <option value="boolean">Boolean</option>
           <option value="list">List</option>
         </select>
-        <input
-          v-model="opt.name"
-          class="opt-name"
-          type="text"
-          placeholder="Name"
-        />
-        <input
-          v-model="opt.value"
-          class="opt-value"
-          type="text"
-          placeholder="Value"
-        />
+        <input v-model="opt.name" class="opt-name" type="text" placeholder="Name" />
+        <input v-model="opt.default" class="opt-value" type="text" placeholder="Default" />
         <button @click="remove(idx)" class="btn-remove">✕</button>
       </li>
     </ul>
@@ -64,7 +54,6 @@ function remove(index: number) {
 </template>
 
 <style scoped>
-
 .options-list {
   list-style: none;
   margin: 0;

@@ -2,12 +2,9 @@
 import { onMounted, onBeforeUnmount, ref } from 'vue'
 import router from '../router/index.ts'
 
-import { BaklavaEditor, useBaklava, Commands, Components  } from '@baklavajs/renderer-vue'
+import { BaklavaEditor, useBaklava, Commands, Components } from '@baklavajs/renderer-vue'
 import { DependencyEngine, applyResult } from '@baklavajs/engine'
-import {
-  type IEditorState,
-  type IGraphState,
-} from 'baklavajs'
+import { type IEditorState, type IGraphState } from 'baklavajs'
 import '@baklavajs/themes/dist/syrup-dark.css'
 
 import EditorToolbar from '@/domains/UserInterface/components/GraphEditor/Toolbar/EditorToolbar.vue'
@@ -40,9 +37,9 @@ settings.enableMinimap = true
 settings.displayValueOnHover = true
 settings.palette.enabled = true
 settings.contextMenu.additionalItems = [
-    { isDivider: true },
-    { label: "Copy", command: Commands.COPY_COMMAND },
-    { label: "Paste", command: Commands.PASTE_COMMAND },
+  { isDivider: true },
+  { label: 'Copy', command: Commands.COPY_COMMAND },
+  { label: 'Paste', command: Commands.PASTE_COMMAND },
 ]
 
 editor.registerNodeType(BasicNode, { category: 'Basics' })
@@ -144,49 +141,63 @@ onMounted(() => {
             class="baklava-toolbar-entry baklava-toolbar-button"
             title="Start Simulation"
             @click="handleStart"
-          >▶️</button>
+          >
+            ▶️
+          </button>
 
           <button
             v-if="running"
             class="baklava-toolbar-entry baklava-toolbar-button green"
             title="Stop Simulation"
             @click="handleStop"
-          >⏹️</button>
+          >
+            ⏹️
+          </button>
 
           <button
             class="baklava-toolbar-entry baklava-toolbar-button"
             title="Save Flow"
             @click="save"
-          >💾</button>
+          >
+            💾
+          </button>
 
           <button
             class="baklava-toolbar-entry baklava-toolbar-button"
             title="Reload last Save"
             @click="load"
-          >♻️</button>
+          >
+            ♻️
+          </button>
 
           <button
             class="baklava-toolbar-entry baklava-toolbar-button"
             title="Reset Simulation"
             @click="resetGraph"
-          >↩️</button>
+          >
+            ↩️
+          </button>
 
           <button
             class="baklava-toolbar-entry baklava-toolbar-button"
             title="Log graph"
             @click="logGraph"
-          >🔎</button>
+          >
+            🔎
+          </button>
 
           <button
             class="baklava-toolbar-entry baklava-toolbar-button"
             title="Home"
             @click="router.push('/')"
-          >🏡</button>
+          >
+            🏡
+          </button>
         </template>
       </EditorToolbar>
     </template>
     <template #node="nodeProps">
-      <BaklavaNode :key="nodeProps.node.id" v-bind="nodeProps"/>
+      <BaklavaNode :key="nodeProps.node.id" v-bind="nodeProps" />
     </template>
     <template #sidebar>
       <CustomSidebar />
@@ -203,7 +214,7 @@ onMounted(() => {
 }
 .baklava-node-palette h1 {
   margin-top: 0;
-  font-size: 1em
+  font-size: 1em;
 }
 .baklava-toolbar {
   padding: 0.5rem;

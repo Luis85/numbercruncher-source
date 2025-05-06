@@ -1,4 +1,3 @@
-
 export interface BasicNodeInterface {
   type: string
   name: string
@@ -10,6 +9,8 @@ export interface BasicNodeInterface {
 
   options: NodeOptionConfiguration[]
   tags: string[]
+  emits: string[]
+  subscribes: string[]
   actions: string[]
   components: string[]
   inputs: NodeOutput[]
@@ -19,7 +20,8 @@ export interface BasicNodeInterface {
   color?: string
   outputs?: NodeOutput
 
-  [key: string]: string
+  [key: string]:
+    | string
     | number
     | boolean
     | NodeOutput
@@ -47,13 +49,48 @@ export interface NodeOptionConfiguration {
   type?: string
   name?: string
   value?: string | number | boolean
+  default?: string | number | boolean
 }
 
-
 export const BASIC_NODE_TYPES = ['BasicNode']
-export const BASIC_NODE_TAGS = ['Actor', 'Scene', 'Component', 'System', 'Supplier', 'Consumer', 'Emitter', 'Subscriber', 'Entity', 'Agent', 'Output', 'Outcome']
-export const BASIC_NODE_COMPONENTS = ['TransformComponent', 'MotionComponent', 'GraphicsComponent', 'PointerComponent', 'ActionsComponent']
-export const BASIC_NODE_ACTIONS = ['Blink', 'CallMethod', 'Delay', 'EaseTo', 'MoveTo/MoveBy', 'Fade', 'RotateTo/RotateBy', 'Repeat', 'Die', 'Follow', 'Meet', 'ScalteTo/ScaleBy']
+export const BASIC_NODE_EVENTS = ['NodeUpdateEvent', 'NodeCalculateEvent', 'NodeErrorEvent']
+export const BASIC_GRAPH_EVENTS = ['GraphStartEvent', 'GrapEndEvent', 'GraphUpdateEvent']
+export const BASIC_NODE_TAGS = [
+  'Actor',
+  'Assembler',
+  'Scene',
+  'Component',
+  'System',
+  'Supplier',
+  'Consumer',
+  'Emitter',
+  'Subscriber',
+  'Entity',
+  'Agent',
+  'Output',
+  'Outcome',
+]
+export const BASIC_NODE_COMPONENTS = [
+  'TransformComponent',
+  'MotionComponent',
+  'GraphicsComponent',
+  'PointerComponent',
+  'ActionsComponent',
+]
+export const BASIC_NODE_ACTIONS = [
+  'Blink',
+  'CallMethod',
+  'Delay',
+  'EaseTo',
+  'MoveTo/MoveBy',
+  'Fade',
+  'RotateTo/RotateBy',
+  'Repeat',
+  'Die',
+  'Follow',
+  'Meet',
+  'ScalteTo/ScaleBy',
+]
 
 export const BASIC_NODE_EMPTY_STATE: BasicNodeInterface = {
   type: 'BasicNode',
@@ -64,6 +101,8 @@ export const BASIC_NODE_EMPTY_STATE: BasicNodeInterface = {
   components: [],
   actions: [],
   inputs: [],
+  emits: [],
+  subscribes: [],
   step: 0,
   width: 0,
   height: 0,
@@ -76,4 +115,3 @@ export const BASIC_NODE_EMPTY_INPUT_STATE: NodeInput = {
   name: 'NodeInputText',
   value: '',
 }
-

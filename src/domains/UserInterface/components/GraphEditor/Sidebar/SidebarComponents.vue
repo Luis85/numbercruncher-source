@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { BASIC_NODE_COMPONENTS, type BasicNodeInterface } from '@/domains/GraphEditor'
 import type { BasicNode as BasicNodeNodeConstructor } from '@/domains/GraphEditor/nodes/BasicNode'
-import type { NodeInterface } from 'baklavajs';
+import type { NodeInterface } from 'baklavajs'
 type BasicNode = InstanceType<typeof BasicNodeNodeConstructor>
 
 // Props & Emits
@@ -23,7 +23,7 @@ watch(
   (newState) => {
     emit('update:modelValue', [...newState.components])
   },
-  {deep: true}
+  { deep: true },
 )
 
 onMounted(() => {
@@ -38,12 +38,7 @@ const options = computed(() => {
 
 <template>
   <p class="mb-0"><strong>Components</strong></p>
-  <Vueform v-model="state" sync :endpoint="false" >
-    <TagsElement
-      name="components"
-      :create="true"
-      :items="options"
-    />
+  <Vueform v-model="state" sync :endpoint="false">
+    <TagsElement name="components" :create="true" :items="options" />
   </Vueform>
 </template>
-

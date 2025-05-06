@@ -1,4 +1,3 @@
-
 import { type App, PluginSettingTab, Setting } from 'obsidian'
 import ObsidianPlugin from '@/main'
 

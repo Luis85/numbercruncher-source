@@ -13,6 +13,7 @@ import CustomSidebar from '../components/GraphEditor/Sidebar/CustomSidebar.vue'
 import { BasicNode } from '@/domains/GraphEditor/nodes/BasicNode'
 import { NoteNode } from '@/domains/GraphEditor/nodes/NoteNode'
 import type { BasicNode as BasicNodeNodeConstructor } from '@/domains/GraphEditor/nodes/BasicNode'
+import { ExtendedNode } from '@/domains/GraphEditor/nodes/ExtendedNode.ts'
 
 type BasicNode = InstanceType<typeof BasicNodeNodeConstructor>
 
@@ -55,6 +56,7 @@ settings.contextMenu.additionalItems = [
 // node registry
 editor.registerNodeType(BasicNode, { category: 'Basics' })
 editor.registerNodeType(NoteNode, { category: 'Basics' })
+editor.registerNodeType(ExtendedNode, { category: 'Blueprints' })
 
 // build the global state object
 engine.hooks.gatherCalculationData.subscribe(token, () => {

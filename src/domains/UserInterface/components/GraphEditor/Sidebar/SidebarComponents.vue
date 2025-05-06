@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { BASIC_NODE_COMPONENTS, type BasicNodeInterface } from '@/domains/GraphEditor'
+import { type BasicNodeInterface } from '@/domains/GraphEditor'
 import type { BasicNode as BasicNodeNodeConstructor } from '@/domains/GraphEditor/nodes/BasicNode'
 import type { NodeInterface } from 'baklavajs'
+import { BASIC_NODE_COMPONENTS } from '@/domains/GraphEditor/constants'
 type BasicNode = InstanceType<typeof BasicNodeNodeConstructor>
 
 // Props & Emits

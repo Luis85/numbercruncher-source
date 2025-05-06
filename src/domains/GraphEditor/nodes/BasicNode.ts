@@ -1,130 +1,28 @@
-import { markRaw } from 'vue'
 import { toPascalCase } from '@/utils/toPascalCase'
 import {
   defineDynamicNode,
-  NodeInterface,
-  allowMultipleConnections,
-  displayInSidebar,
   SelectInterface,
   AbstractNode,
   NumberInterface,
   TextInputInterface,
 } from 'baklavajs'
-import {
-  BASIC_NODE_EMPTY_OUTPUT_STATE,
-  BASIC_NODE_EMPTY_STATE,
-  BASIC_NODE_TYPES,
-  BASIC_NODE_VIEWS,
-  type BasicNodeInterface,
-  type NodeOptionConfiguration,
-  type NodeOutput,
-  type NodeStatistics,
-} from '..'
+import { type BasicNodeGlobals, type NodeOutput, type NodeStatistics } from '..'
+import { basicNodeInputs, basicNodeOutputs, type BasicNodeInputs } from '../ports'
 
-import BasicNodeRenderer from '@/domains/UserInterface/components/GraphEditor/Node/BasicNode.vue'
-import SidebarTags from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarTags.vue'
-import SidebarEmitEvents from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarEmitEvents.vue'
-import SidebarSubscribeEvents from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarSubscribeEvents.vue'
-import SidebarActions from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarActions.vue'
-import SidebarOptions from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarOptions.vue'
-import SidebarColor from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarColor.vue'
-import SidebarComponents from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarComponents.vue'
-import SidebarResources from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarResources.vue'
-
-export const BasicNode = defineDynamicNode({
+export const basicNodeConfig = {
   type: 'BasicNode',
   title: '🧱Node',
-  // static interfaces
-  inputs: {
-    // ports for other nodes to connect to
-    parent: () => new NodeInterface<string | undefined>('Parent', undefined),
-    inputs: () => new NodeInterface<NodeOutput[]>('Inputs', []).use(allowMultipleConnections),
 
-    // Node view port, acts as glue to the vue application
-    view: () =>
-      new NodeInterface<BasicNodeInterface>('View', structuredClone(BASIC_NODE_EMPTY_STATE))
-        .setComponent(markRaw(BasicNodeRenderer))
-        .setPort(false),
+  inputs: basicNodeInputs,
+  outputs: basicNodeOutputs,
 
-    // Sidebar Options
-    type: () =>
-      new SelectInterface('Type', 'BasicNode', structuredClone(BASIC_NODE_TYPES))
-        .setHidden(true)
-        .use(displayInSidebar, true)
-        .setPort(false),
-    nodeView: () =>
-      new SelectInterface('View', 'BasicNodeView', structuredClone(BASIC_NODE_VIEWS))
-        .setHidden(true)
-        .use(displayInSidebar, true)
-        .setPort(false),
-    width: () =>
-      new NumberInterface('Width', 0).setHidden(true).use(displayInSidebar, true).setPort(false),
-    height: () =>
-      new NumberInterface('Height', 0).setHidden(true).use(displayInSidebar, true).setPort(false),
-    scale: () =>
-      new NumberInterface('Scale', 1).setHidden(true).use(displayInSidebar, true).setPort(false),
-    color: () =>
-      new NodeInterface<string>('Color', '')
-        .setHidden(true)
-        .use(displayInSidebar, true)
-        .setComponent(markRaw(SidebarColor))
-        .setPort(false),
-
-    // Event System
-    emits: () =>
-      new NodeInterface<string[]>('Emits', [])
-        .setHidden(true)
-        .use(displayInSidebar, true)
-        .setComponent(markRaw(SidebarEmitEvents))
-        .setPort(false),
-    subscribes: () =>
-      new NodeInterface<string[]>('Subscribes', [])
-        .setHidden(true)
-        .use(displayInSidebar, true)
-        .setComponent(markRaw(SidebarSubscribeEvents))
-        .setPort(false),
-
-    // ECS Settings
-    tags: () =>
-      new NodeInterface<string[]>('Tags', [])
-        .setHidden(true)
-        .use(displayInSidebar, true)
-        .setComponent(markRaw(SidebarTags))
-        .setPort(false),
-    actions: () =>
-      new NodeInterface<string[]>('Actions', [])
-        .setHidden(true)
-        .use(displayInSidebar, true)
-        .setComponent(markRaw(SidebarActions))
-        .setPort(false),
-    components: () =>
-      new NodeInterface<string[]>('Components', [])
-        .setHidden(true)
-        .use(displayInSidebar, true)
-        .setComponent(markRaw(SidebarComponents))
-        .setPort(false),
-    resources: () =>
-      new NodeInterface<string[]>('Resources', [])
-        .setHidden(true)
-        .use(displayInSidebar, true)
-        .setComponent(markRaw(SidebarResources))
-        .setPort(false),
-    options: () =>
-      new NodeInterface<NodeOptionConfiguration[]>('Options', [])
-        .setHidden(true)
-        .use(displayInSidebar, true)
-        .setComponent(markRaw(SidebarOptions))
-        .setPort(false),
+  onCreate() {
+    const node = this as unknown as AbstractNode
+    node.width = 650
+    node.twoColumn = true
   },
 
-  outputs: {
-    // propagate own id to a designated child
-    children: () => new NodeInterface<string>('Children', ''),
-    // provide the calculated output for further consumption
-    outputs: () => new NodeInterface<NodeOutput>('Outputs', { ...BASIC_NODE_EMPTY_OUTPUT_STATE }),
-  },
-
-  onUpdate(inputs) {
+  onUpdate(inputs: BasicNodeInputs) {
     const node = this as unknown as AbstractNode
     const dynamic: Record<string, () => TextInputInterface | NumberInterface | SelectInterface> = {}
     const keys: string[] = []
@@ -206,9 +104,9 @@ export const BasicNode = defineDynamicNode({
     }
   },
 
-  calculate(inputs, { globalValues }) {
+  calculate(inputs: BasicNodeInputs, { globalValues }: { globalValues: BasicNodeGlobals }) {
     const node = this as unknown as AbstractNode
-    const { step } = globalValues as { step: number }
+    const { step } = globalValues as unknown as { step: number }
 
     inputs.view.step = step
     inputs.view.inputs = inputs.inputs
@@ -230,7 +128,7 @@ export const BasicNode = defineDynamicNode({
     complexity += inputs.resources.length
     complexity += inputs.options.length
 
-    const output: NodeOutput = {
+    const nodeOutput: NodeOutput = {
       id: node.id,
       type: inputs.type,
       values: [
@@ -260,15 +158,11 @@ export const BasicNode = defineDynamicNode({
     // prepare outputs
     const outputs = {
       children: node.id,
-      outputs: output,
+      outputs: nodeOutput,
     }
 
     return outputs
   },
+}
 
-  onCreate() {
-    const node = this as unknown as AbstractNode
-    node.width = 650
-    node.twoColumn = true
-  },
-})
+export const BasicNode = defineDynamicNode(basicNodeConfig)

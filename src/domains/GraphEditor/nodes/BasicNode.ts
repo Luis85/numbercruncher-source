@@ -158,11 +158,13 @@ export const BasicNode = defineDynamicNode({
     }
 
     for (const action of inputs.actions) {
-      dynamic[action] = () => new TextInputInterface(toPascalCase(action) + 'Action', '').setPort(false)
+      dynamic[action] = () =>
+        new TextInputInterface(toPascalCase(action) + 'Action', '').setPort(false)
     }
 
     for (const resource of inputs.resources) {
-      dynamic[resource] = () => new TextInputInterface(toPascalCase(resource) + 'Resource', '').setPort(false)
+      dynamic[resource] = () =>
+        new TextInputInterface(toPascalCase(resource) + 'Resource', '').setPort(false)
     }
 
     return {

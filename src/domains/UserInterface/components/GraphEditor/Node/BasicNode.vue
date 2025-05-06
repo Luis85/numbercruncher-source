@@ -78,9 +78,17 @@ watch(
 </script>
 
 <template>
-  <h4>{{ state.title }}</h4>
+  <p><strong>Type:</strong> {{ state.type }}</p>
   <button @click="emit('openSidebar')">Edit</button>
   <button @click="debug = !debug">Debug {{ debug }}</button>
   <button v-if="debug" @click="console.log({ ...state })">Log State</button>
   <pre v-if="debug">{{ state }}</pre>
+
+  <hr v-if="state.tags.length > 0" />
+
+  <section>
+    <p>
+      <span v-for="(tag, index) in state.tags" :key="index">{{ tag }} </span>
+    </p>
+  </section>
 </template>

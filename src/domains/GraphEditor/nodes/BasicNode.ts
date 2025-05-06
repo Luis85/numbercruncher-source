@@ -150,6 +150,15 @@ export const BasicNode = defineDynamicNode({
           dynamic[key] = () => new TextInputInterface(key, String(value ?? '')).setPort(false)
       }
     }
+
+    for (const component of inputs.components) {
+      dynamic[component] = () => new TextInputInterface(component, '').setPort(false)
+    }
+
+    for (const action of inputs.actions) {
+      dynamic[action] = () => new TextInputInterface(action, '').setPort(false)
+    }
+
     return {
       inputs: dynamic,
       //forceUpdateInputs: keys

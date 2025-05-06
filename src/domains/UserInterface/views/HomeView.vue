@@ -1,6 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import MainNavigation from '@/domains/UserInterface/components/Navigation/MainNavigation.vue'
+</script>
 
 <template>
+  <MainNavigation />
+
   <h1>Hello / Home</h1>
   <section>
     <h2>Hello, Bootstrap and Vite!</h2>

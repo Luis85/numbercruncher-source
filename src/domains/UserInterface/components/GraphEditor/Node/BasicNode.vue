@@ -22,6 +22,7 @@ const emit = defineEmits<{
 }>()
 
 const state = ref<BasicNodeInterface>({ ...props.modelValue })
+const debug = ref(false)
 
 function processInputs(newInputs: NodeOutput[]) {
   if (!state.value.id) return
@@ -77,8 +78,9 @@ watch(
 </script>
 
 <template>
-  <h4>Node State</h4>
+  <h4>{{ state.title }}</h4>
   <button @click="emit('openSidebar')">Edit</button>
-  <button @click="console.log({ ...state })">Log State</button>
-  <pre>{{ state }}</pre>
+  <button @click="debug = !debug">Debug {{ debug }}</button>
+  <button v-if="debug" @click="console.log({ ...state })">Log State</button>
+  <pre v-if="debug">{{ state }}</pre>
 </template>

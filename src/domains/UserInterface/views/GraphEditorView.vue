@@ -110,8 +110,8 @@ function resetGraph() {
     inputs: [],
     outputs: [],
     panning: {
-      x: 0,
-      y: 0,
+      x: 400,
+      y: 250,
     },
     scaling: 0.6,
   }

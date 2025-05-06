@@ -26,6 +26,7 @@ import SidebarActions from '@/domains/UserInterface/components/GraphEditor/Sideb
 import SidebarOptions from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarOptions.vue'
 import SidebarColor from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarColor.vue'
 import SidebarComponents from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarComponents.vue'
+import SidebarResources from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarResources.vue'
 
 export const BasicNode = defineDynamicNode({
   type: 'BasicNode',
@@ -54,11 +55,6 @@ export const BasicNode = defineDynamicNode({
       new NumberInterface('Height', 0).setHidden(true).use(displayInSidebar, true).setPort(false),
     scale: () =>
       new NumberInterface('Scale', 1).setHidden(true).use(displayInSidebar, true).setPort(false),
-    resources: () =>
-      new SelectInterface('Resources', '', [])
-        .setHidden(true)
-        .use(displayInSidebar, true)
-        .setPort(false),
     color: () =>
       new NodeInterface<string>('Color', '')
         .setHidden(true)
@@ -98,6 +94,12 @@ export const BasicNode = defineDynamicNode({
         .setHidden(true)
         .use(displayInSidebar, true)
         .setComponent(markRaw(SidebarComponents))
+        .setPort(false),
+    resources: () =>
+      new NodeInterface<string[]>('Resources', [])
+        .setHidden(true)
+        .use(displayInSidebar, true)
+        .setComponent(markRaw(SidebarResources))
         .setPort(false),
     options: () =>
       new NodeInterface<NodeOptionConfiguration[]>('Options', [])
@@ -152,11 +154,15 @@ export const BasicNode = defineDynamicNode({
     }
 
     for (const component of inputs.components) {
-      dynamic[component] = () => new TextInputInterface(component, '').setPort(false)
+      dynamic[component] = () => new TextInputInterface(toPascalCase(component), '').setPort(false)
     }
 
     for (const action of inputs.actions) {
-      dynamic[action] = () => new TextInputInterface(action, '').setPort(false)
+      dynamic[action] = () => new TextInputInterface(toPascalCase(action) + 'Action', '').setPort(false)
+    }
+
+    for (const resource of inputs.resources) {
+      dynamic[resource] = () => new TextInputInterface(toPascalCase(resource) + 'Resource', '').setPort(false)
     }
 
     return {
@@ -190,9 +196,10 @@ export const BasicNode = defineDynamicNode({
 
     // ECS
     inputs.view.tags = inputs.tags
-    inputs.view.options = inputs.options
     inputs.view.actions = inputs.actions
     inputs.view.components = inputs.components
+    inputs.view.resources = inputs.resources
+    inputs.view.options = inputs.options
 
     // prepare outputs
     const outputs = {

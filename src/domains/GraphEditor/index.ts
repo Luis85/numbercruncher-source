@@ -52,7 +52,15 @@ export interface NodeOptionConfiguration {
   default?: string | number | boolean
 }
 
-export const BASIC_NODE_TYPES = ['BasicNode']
+export const BASIC_NODE_TYPES = [
+  'BasicNode',
+  'ActorNode',
+  'ComponentNode',
+  'SystemNode',
+  'SceneNode',
+  'EngineNode',
+  'AssemblerNode',
+]
 export const BASIC_NODE_EVENTS = ['NodeUpdateEvent', 'NodeCalculateEvent', 'NodeErrorEvent']
 export const BASIC_GRAPH_EVENTS = ['GraphStartEvent', 'GrapEndEvent', 'GraphUpdateEvent']
 export const BASIC_NODE_TAGS = [
@@ -71,6 +79,7 @@ export const BASIC_NODE_TAGS = [
   'Outcome',
 ]
 export const BASIC_NODE_COMPONENTS = [
+  'StateMachineComponent',
   'TransformComponent',
   'MotionComponent',
   'GraphicsComponent',

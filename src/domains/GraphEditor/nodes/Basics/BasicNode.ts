@@ -6,8 +6,8 @@ import {
   NumberInterface,
   TextInputInterface,
 } from 'baklavajs'
-import { type BasicNodeGlobals, type NodeOutput, type NodeStatistics } from '..'
-import { basicNodeInputs, basicNodeOutputs, type BasicNodeInputs } from '../ports'
+import { type BasicNodeGlobals, type NodeOutput, type NodeStatistics } from '../..'
+import { basicNodeInputs, basicNodeOutputs, type BasicNodeInputs } from '../../ports'
 
 export const basicNodeConfig = {
   type: 'BasicNode',

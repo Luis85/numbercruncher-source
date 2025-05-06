@@ -10,10 +10,10 @@ import '@baklavajs/themes/dist/syrup-dark.css'
 import EditorToolbar from '@/domains/UserInterface/components/GraphEditor/Toolbar/EditorToolbar.vue'
 import CustomSidebar from '../components/GraphEditor/Sidebar/CustomSidebar.vue'
 
-import { BasicNode } from '@/domains/GraphEditor/nodes/BasicNode'
-import { NoteNode } from '@/domains/GraphEditor/nodes/NoteNode'
-import type { BasicNode as BasicNodeNodeConstructor } from '@/domains/GraphEditor/nodes/BasicNode'
-import { ExtendedNode } from '@/domains/GraphEditor/nodes/ExtendedNode.ts'
+import { BasicNode } from '@/domains/GraphEditor/nodes/Basics/BasicNode.ts'
+import { NoteNode } from '@/domains/GraphEditor/nodes/Basics/NoteNode.ts'
+import type { BasicNode as BasicNodeNodeConstructor } from '@/domains/GraphEditor/nodes/Basics/BasicNode.ts'
+import { ExtendedNode } from '@/domains/GraphEditor/nodes/Blueprints/ExtendedNode.ts'
 
 type BasicNode = InstanceType<typeof BasicNodeNodeConstructor>
 

@@ -1,6 +1,6 @@
 import { defineDynamicNode } from 'baklavajs'
 import { NumberInterface, TextInputInterface } from 'baklavajs'
-import { basicNodeConfig } from './BasicNode'
+import { basicNodeConfig } from '../Basics/BasicNode'
 
 export const ExtendedNode = defineDynamicNode({
   // 1: komplett alles von basicNodeConfig übernehmen

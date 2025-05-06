@@ -26,6 +26,9 @@ const running = ref<boolean>(false)
 let step = 0
 let ticker: number | null = null
 
+settings.enableMinimap = true
+settings.displayValueOnHover = true
+
 settings.sidebar.resizable = true
 settings.sidebar.enabled = true
 
@@ -33,22 +36,25 @@ settings.nodes.resizable = true
 settings.nodes.defaultWidth = 300
 settings.nodes.maxWidth = 1200
 settings.nodes.minWidth = 300
-settings.enableMinimap = true
-settings.displayValueOnHover = true
+
 settings.palette.enabled = true
+
 settings.contextMenu.additionalItems = [
   { isDivider: true },
   { label: 'Copy', command: Commands.COPY_COMMAND },
   { label: 'Paste', command: Commands.PASTE_COMMAND },
 ]
 
+// node registry
 editor.registerNodeType(BasicNode, { category: 'Basics' })
 editor.registerNodeType(NoteNode, { category: 'Basics' })
 
+// build the global state object
 engine.hooks.gatherCalculationData.subscribe(token, () => {
   return { step: step }
 })
 
+// apply calculation results to the graph
 engine.events.afterRun.subscribe(token, (result) => {
   engine.pause()
   applyResult(result, editor)
@@ -74,18 +80,12 @@ function handleStop() {
   }
 }
 
-onBeforeUnmount(() => {
-  if (ticker !== null) {
-    clearInterval(ticker)
-  }
-})
-
-const save = () => {
+function save() {
   console.log('Saving to localstorage')
   window.localStorage.setItem(graphName, JSON.stringify(editor.save()))
 }
 
-const load = () => {
+function load() {
   const state = window.localStorage.getItem(graphName)
 
   if (!state) {
@@ -110,10 +110,10 @@ function resetGraph() {
     inputs: [],
     outputs: [],
     panning: {
-      x: 420,
-      y: 270,
+      x: 0,
+      y: 0,
     },
-    scaling: 0.8,
+    scaling: 0.6,
   }
   const state: IEditorState = {
     graph,
@@ -128,6 +128,12 @@ function logGraph() {
 
 onMounted(() => {
   load()
+})
+
+onBeforeUnmount(() => {
+  if (ticker !== null) {
+    clearInterval(ticker)
+  }
 })
 </script>
 

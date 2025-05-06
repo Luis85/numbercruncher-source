@@ -1,5 +1,6 @@
 export interface BasicNodeInterface {
   type: string
+  view: string
   name: string
   title: string
   step: number
@@ -59,32 +60,45 @@ export const BASIC_NODE_TYPES = [
   'SystemNode',
   'SceneNode',
   'EngineNode',
+  'StockNode',
   'AssemblerNode',
+  'TestNode',
+  'EventNode',
+  'ViewNode',
 ]
+export const BASIC_NODE_VIEWS = ['BasicNodeView']
 export const BASIC_NODE_EVENTS = ['NodeUpdateEvent', 'NodeCalculateEvent', 'NodeErrorEvent']
-export const BASIC_GRAPH_EVENTS = ['GraphStartEvent', 'GrapEndEvent', 'GraphUpdateEvent']
+export const BASIC_GRAPH_EVENTS = ['GraphStartEvent', 'GraphEndEvent', 'GraphUpdateEvent']
 export const BASIC_NODE_TAGS = [
-  'Actor',
-  'Assembler',
-  'Scene',
-  'Component',
-  'System',
+  'External',
+  'Vendor',
   'Supplier',
   'Consumer',
-  'Emitter',
-  'Subscriber',
-  'Entity',
+  'Producer',
+  'Process',
+  'Product',
+  'Project',
+  'Spawner',
+  'Replicator',
+  'Risk',
+  'Requirement',
   'Agent',
+  'Population',
+  'Area',
   'Output',
   'Outcome',
+  'RaceTrack',
 ]
 export const BASIC_NODE_COMPONENTS = [
   'StateMachineComponent',
   'TransformComponent',
   'MotionComponent',
   'GraphicsComponent',
+  'SvgGraphicsComponent',
   'PointerComponent',
   'ActionsComponent',
+  'EconomicsComponent',
+  'EvolutionComponent',
 ]
 export const BASIC_NODE_ACTIONS = [
   'Blink',
@@ -103,6 +117,7 @@ export const BASIC_NODE_ACTIONS = [
 
 export const BASIC_NODE_EMPTY_STATE: BasicNodeInterface = {
   type: 'BasicNode',
+  view: 'BasicNodeView',
   name: 'BasicNode',
   title: 'BasicNode',
   tags: [],
@@ -123,4 +138,10 @@ export const BASIC_NODE_EMPTY_INPUT_STATE: NodeInput = {
   type: 'NodeInput',
   name: 'NodeInputText',
   value: '',
+}
+
+export const BASIC_NODE_EMPTY_OUTPUT_STATE: NodeOutput = {
+  id: '',
+  type: 'NodeOutput',
+  values: [],
 }

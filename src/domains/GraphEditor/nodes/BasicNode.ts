@@ -11,11 +11,14 @@ import {
   TextInputInterface,
 } from 'baklavajs'
 import {
+  BASIC_NODE_EMPTY_OUTPUT_STATE,
   BASIC_NODE_EMPTY_STATE,
   BASIC_NODE_TYPES,
+  BASIC_NODE_VIEWS,
   type BasicNodeInterface,
   type NodeOptionConfiguration,
   type NodeOutput,
+  type NodeStatistics,
 } from '..'
 
 import BasicNodeRenderer from '@/domains/UserInterface/components/GraphEditor/Node/BasicNode.vue'
@@ -30,7 +33,7 @@ import SidebarResources from '@/domains/UserInterface/components/GraphEditor/Sid
 
 export const BasicNode = defineDynamicNode({
   type: 'BasicNode',
-  title: '🧱Basic Node',
+  title: '🧱Node',
   // static interfaces
   inputs: {
     // ports for other nodes to connect to
@@ -46,6 +49,11 @@ export const BasicNode = defineDynamicNode({
     // Sidebar Options
     type: () =>
       new SelectInterface('Type', 'BasicNode', structuredClone(BASIC_NODE_TYPES))
+        .setHidden(true)
+        .use(displayInSidebar, true)
+        .setPort(false),
+    nodeView: () =>
+      new SelectInterface('View', 'BasicNodeView', structuredClone(BASIC_NODE_VIEWS))
         .setHidden(true)
         .use(displayInSidebar, true)
         .setPort(false),
@@ -113,10 +121,11 @@ export const BasicNode = defineDynamicNode({
     // propagate own id to a designated child
     children: () => new NodeInterface<string>('Children', ''),
     // provide the calculated output for further consumption
-    outputs: () => new NodeInterface<NodeOutput | undefined>('Outputs', undefined),
+    outputs: () => new NodeInterface<NodeOutput>('Outputs', { ...BASIC_NODE_EMPTY_OUTPUT_STATE }),
   },
 
   onUpdate(inputs) {
+    const node = this as unknown as AbstractNode
     const dynamic: Record<string, () => TextInputInterface | NumberInterface | SelectInterface> = {}
     const keys: string[] = []
 
@@ -167,6 +176,30 @@ export const BasicNode = defineDynamicNode({
         new TextInputInterface(toPascalCase(resource) + 'Resource', '').setPort(false)
     }
 
+    // feed the viewmodel with values provided by baklava
+    inputs.view.id = node.id
+    inputs.view.title = node.title
+    inputs.view.name = toPascalCase(node.title)
+
+    // feed the viewmodel with the user input from static inputs
+    inputs.view.type = toPascalCase(inputs.type)
+    inputs.view.view = inputs.nodeView
+    inputs.view.color = inputs.color
+    inputs.view.width = inputs.width
+    inputs.view.height = inputs.height
+    inputs.view.scale = inputs.scale
+    inputs.view.parent = inputs.parent
+
+    inputs.view.emits = inputs.emits
+    inputs.view.subscribes = inputs.subscribes
+
+    // ECS
+    inputs.view.tags = inputs.tags
+    inputs.view.actions = inputs.actions
+    inputs.view.components = inputs.components
+    inputs.view.resources = inputs.resources
+    inputs.view.options = inputs.options
+
     return {
       inputs: dynamic,
       //forceUpdateInputs: keys
@@ -177,36 +210,57 @@ export const BasicNode = defineDynamicNode({
     const node = this as unknown as AbstractNode
     const { step } = globalValues as { step: number }
 
-    // feed the viewmodel with values provided by baklava
-    inputs.view.id = node.id
-    inputs.view.title = node.title
-    inputs.view.name = toPascalCase(node.title)
     inputs.view.step = step
-
-    // feed the viewmodel for the next step with the user input from static inputs
-    // dynamic inputs should be calculated in the update function
-    inputs.view.type = toPascalCase(inputs.type)
-    inputs.view.color = inputs.color
-    inputs.view.width = inputs.width
-    inputs.view.height = inputs.height
-    inputs.view.scale = inputs.scale
-    inputs.view.parent = inputs.parent
-
-    inputs.view.emits = inputs.emits
-    inputs.view.subscribes = inputs.subscribes
     inputs.view.inputs = inputs.inputs
 
-    // ECS
-    inputs.view.tags = inputs.tags
-    inputs.view.actions = inputs.actions
-    inputs.view.components = inputs.components
-    inputs.view.resources = inputs.resources
-    inputs.view.options = inputs.options
+    const size = inputs.inputs.length + 1 + (inputs.parent ? 1 : 0)
+    let complexity = 0
+    for (const input of inputs.inputs) {
+      const metric = input.values.find(
+        (item) => item.type === 'NodeStatistics' && item.name === 'complexity',
+      )
+      if (metric) complexity += Number(metric.value)
+    }
+
+    complexity += size
+    complexity += inputs.emits.length
+    complexity += inputs.subscribes.length
+    complexity += inputs.components.length
+    complexity += inputs.actions.length
+    complexity += inputs.resources.length
+    complexity += inputs.options.length
+
+    const output: NodeOutput = {
+      id: node.id,
+      type: inputs.type,
+      values: [
+        {
+          type: 'NodeStatistics',
+          name: 'inputCount',
+          value: inputs.inputs.length,
+        },
+        {
+          type: 'NodeStatistics',
+          name: 'size',
+          value: size,
+        },
+        {
+          type: 'NodeStatistics',
+          name: 'complexity',
+          value: complexity,
+        },
+        {
+          type: 'NodeStatistics',
+          name: 'step',
+          value: step,
+        },
+      ] as NodeStatistics[],
+    }
 
     // prepare outputs
     const outputs = {
       children: node.id,
-      outputs: inputs.view.outputs,
+      outputs: output,
     }
 
     return outputs

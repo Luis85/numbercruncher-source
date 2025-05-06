@@ -12,6 +12,9 @@ import CustomSidebar from '../components/GraphEditor/Sidebar/CustomSidebar.vue'
 
 import { BasicNode } from '@/domains/GraphEditor/nodes/BasicNode'
 import { NoteNode } from '@/domains/GraphEditor/nodes/NoteNode'
+import type { BasicNode as BasicNodeNodeConstructor } from '@/domains/GraphEditor/nodes/BasicNode'
+
+type BasicNode = InstanceType<typeof BasicNodeNodeConstructor>
 
 const baklava = useBaklava()
 const editor = baklava.editor
@@ -207,7 +210,11 @@ onBeforeUnmount(() => {
       </EditorToolbar>
     </template>
     <template #node="nodeProps">
-      <BaklavaNode :key="nodeProps.node.id" v-bind="nodeProps" />
+      <BaklavaNode
+        :key="nodeProps.node.id"
+        v-bind="nodeProps"
+        :class="(nodeProps.node as BasicNode).inputs.type?.value"
+      />
     </template>
     <template #sidebar>
       <CustomSidebar />

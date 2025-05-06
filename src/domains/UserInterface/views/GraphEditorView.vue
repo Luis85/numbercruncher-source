@@ -41,8 +41,12 @@ settings.palette.enabled = true
 
 settings.contextMenu.additionalItems = [
   { isDivider: true },
-  { label: 'Copy', command: Commands.COPY_COMMAND },
+  { label: 'Zoom Fit', command: Commands.ZOOM_TO_FIT_GRAPH_COMMAND },
+  { label: 'Box Select', command: Commands.START_SELECTION_BOX_COMMAND },
+  { label: 'Create Subgraph', command: Commands.CREATE_SUBGRAPH_COMMAND },
+  { label: 'Copy Selected', command: Commands.COPY_COMMAND },
   { label: 'Paste', command: Commands.PASTE_COMMAND },
+  { label: 'Delete Selected', command: Commands.DELETE_NODES_COMMAND },
 ]
 
 // node registry

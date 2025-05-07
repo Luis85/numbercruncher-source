@@ -1,5 +1,6 @@
 export interface BasicNodeInterface {
   type: string
+  description: string
   view: string
   name: string
   title: string
@@ -9,6 +10,7 @@ export interface BasicNodeInterface {
   scale: number
 
   options: NodeOptionConfiguration[]
+  exports: string[]
   tags: string[]
   emits: string[]
   subscribes: string[]
@@ -31,20 +33,17 @@ export interface BasicNodeInterface {
     | NodeOptionConfiguration[]
     | undefined
 }
+
 export interface NodeOutput {
   type: string
   id: string
+  parent?: string
   values: NodeInput[]
 }
 export interface NodeInput {
   type: string
   name: string
   value: string | number | boolean | undefined
-}
-export interface NodeStatistics extends NodeInput {
-  type: 'NodeStatistics'
-  name: 'inputCount' | 'size' | 'complexity'
-  value: number | undefined
 }
 
 export interface NodeOptionConfiguration {

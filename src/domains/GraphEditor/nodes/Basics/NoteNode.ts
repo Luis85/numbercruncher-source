@@ -2,7 +2,7 @@ import { defineNode, AbstractNode, TextareaInputInterface } from 'baklavajs'
 
 export const NoteNode = defineNode({
   type: 'NoteNode',
-  title: '📑Note',
+  title: '📑New Note',
   inputs: {
     text: () => new TextareaInputInterface('Note', '').setPort(false),
   },

@@ -4,6 +4,7 @@ import {
   SelectInterface,
   displayInSidebar,
   NumberInterface,
+  TextareaInputInterface,
 } from 'baklavajs'
 import { markRaw } from 'vue'
 import type { NodeOutput, BasicNodeInterface, NodeOptionConfiguration } from '.'
@@ -23,6 +24,7 @@ import SidebarOptions from '@/domains/UserInterface/components/GraphEditor/Sideb
 import SidebarColor from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarColor.vue'
 import SidebarComponents from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarComponents.vue'
 import SidebarResources from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarResources.vue'
+import SidebarInputExports from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarInputExports.vue'
 
 export const basicNodeInputs = {
   // ports for other nodes to connect to
@@ -38,6 +40,11 @@ export const basicNodeInputs = {
   // Sidebar Options
   type: () =>
     new SelectInterface('Type', 'BasicNode', structuredClone(BASIC_NODE_TYPES))
+      .setHidden(true)
+      .use(displayInSidebar, true)
+      .setPort(false),
+  description: () =>
+    new TextareaInputInterface('Description', '')
       .setHidden(true)
       .use(displayInSidebar, true)
       .setPort(false),
@@ -71,6 +78,13 @@ export const basicNodeInputs = {
       .setHidden(true)
       .use(displayInSidebar, true)
       .setComponent(markRaw(SidebarSubscribeEvents))
+      .setPort(false),
+
+  exports: () =>
+    new NodeInterface<string[]>('Output Composer', [])
+      .setHidden(true)
+      .use(displayInSidebar, true)
+      .setComponent(markRaw(SidebarInputExports))
       .setPort(false),
 
   // ECS Settings
@@ -118,6 +132,7 @@ export interface BasicNodeInputs {
   inputs: NodeOutput[]
   view: BasicNodeInterface
   type: string
+  description: string
   nodeView: string
   width: number
   height: number
@@ -126,6 +141,7 @@ export interface BasicNodeInputs {
   emits: string[]
   subscribes: string[]
   tags: string[]
+  exports: string[]
   actions: string[]
   components: string[]
   resources: string[]

@@ -87,8 +87,9 @@ const complexity = computed(() => {
 .baklava-node.TestNode {
   background-color: rgba(10, 137, 17, 0.4);
 }
+.baklava-node.FunctionNode,
 .baklava-node.ComponentNode {
-  background-color: rgba(247, 234, 89, 0.4);
+  background-color: rgba(255, 237, 34, 0.4);
 }
 
 .baklava-node.SceneNode {

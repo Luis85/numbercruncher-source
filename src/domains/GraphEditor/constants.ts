@@ -12,6 +12,7 @@ export const BASIC_NODE_TYPES = [
   'TestNode',
   'EventNode',
   'ViewNode',
+  'FunctionNode',
 ]
 export const BASIC_NODE_VIEWS = ['BasicNodeView']
 export const BASIC_NODE_EVENTS = ['NodeUpdateEvent', 'NodeCalculateEvent', 'NodeErrorEvent']
@@ -37,17 +38,24 @@ export const BASIC_NODE_TAGS = [
   'RaceTrack',
 ]
 export const BASIC_NODE_COMPONENTS = [
-  'StateMachineComponent',
-  'TransformComponent',
-  'MotionComponent',
-  'GraphicsComponent',
-  'SvgGraphicsComponent',
-  'PointerComponent',
-  'ActionsComponent',
-  'EconomicsComponent',
-  'EvolutionComponent',
+  'Trigger',
+  'Timer',
+  'StateMachine',
+  'Transform',
+  'Motion',
+  'Graphics',
+  'SvgGraphics',
+  'Pointer',
+  'Actions',
+  'Economics',
+  'Evolution',
 ]
 export const BASIC_NODE_ACTIONS = [
+  'Use',
+  'Take',
+  'Jump',
+  'Inspect',
+  'Lift',
   'Blink',
   'CallMethod',
   'Delay',
@@ -64,9 +72,11 @@ export const BASIC_NODE_ACTIONS = [
 
 export const BASIC_NODE_EMPTY_STATE: BasicNodeInterface = {
   type: 'BasicNode',
+  description: '',
   view: 'BasicNodeView',
   name: 'BasicNode',
-  title: 'BasicNode',
+  title: '🧱New Node',
+  exports: [],
   tags: [],
   options: [],
   components: [],

@@ -29,6 +29,12 @@ export const BASIC_NODE_CONFIG = {
     node.twoColumn = true
   },
 
+  /**
+   * Node onUpdate
+   *
+   * prepares all the dynamic input nodes and syncs the view with them
+   *
+   */
   onUpdate(inputs: BasicNodeInputs) {
     const node = this as unknown as AbstractNode
     const dynamicInputs: NodeOptionConfiguration[] = [...inputs.options]
@@ -152,26 +158,7 @@ export const BASIC_NODE_CONFIG = {
       type: inputs.type,
       name: node.title,
       parent: inputs.parent,
-      values: [
-        {
-          type: 'NodeStatistics',
-          name: 'inputCount',
-          label: 'statistics',
-          value: inputs.inputs.length,
-        },
-        {
-          type: 'NodeStatistics',
-          name: 'size',
-          label: 'statistics',
-          value: size,
-        },
-        {
-          type: 'NodeStatistics',
-          name: 'complexity',
-          label: 'statistics',
-          value: complexity,
-        },
-      ],
+      values: [],
     }
 
     // add the selected components to the output
@@ -187,9 +174,7 @@ export const BASIC_NODE_CONFIG = {
     }
 
     /**
-     * Build the exported nodes
-     * @todo: currently the system works out of the type as string[]. this does not work with multiple exports of the same type.
-     * needs to be redone to be object.id based
+     * add the exported nodes
      */
     for (const exportedInput of inputs.exports) {
       const input = inputs.inputs.find((item) => item.id === exportedInput.value)
@@ -203,7 +188,7 @@ export const BASIC_NODE_CONFIG = {
     }
 
     /**
-     * Add the created options to the output
+     * add the created options
      */
     for (const option of options) {
       if (!option.type || !option.name) continue
@@ -218,6 +203,31 @@ export const BASIC_NODE_CONFIG = {
         value: optionValue,
       })
     }
+
+    /**
+     * add the node statistics
+     */
+    const nodeStats = [
+      {
+        type: 'NodeStatistics',
+        name: 'inputCount',
+        label: 'statistics',
+        value: inputs.inputs.length,
+      },
+      {
+        type: 'NodeStatistics',
+        name: 'size',
+        label: 'statistics',
+        value: size,
+      },
+      {
+        type: 'NodeStatistics',
+        name: 'complexity',
+        label: 'statistics',
+        value: complexity,
+      },
+    ]
+    nodeOutput.values.push(...nodeStats)
 
     inputs.view.step = step
     inputs.view.inputs = inputs.inputs

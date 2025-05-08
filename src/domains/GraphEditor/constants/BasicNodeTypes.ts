@@ -3,6 +3,7 @@ export const BASIC_NODE_TYPES = [
   'ActorNode',
   'SceneNode',
   'EngineNode',
+  'CameraNode',
   'ComponentNode',
   'SystemNode',
   'SpawnNode',
@@ -18,4 +19,5 @@ export const BASIC_NODE_TYPES = [
   'MarketNode',
   'DeliverableNode',
   'PiniaStoreNode',
+  'StateMachineNode',
 ]

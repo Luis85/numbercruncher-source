@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref } from 'vue'
+import { onMounted, onBeforeUnmount, ref, computed, watch } from 'vue'
 import router from '../router/index.ts'
 
-import { BaklavaEditor, useBaklava, Commands, Components } from '@baklavajs/renderer-vue'
+import { BaklavaEditor, useBaklava, Components, Commands } from '@baklavajs/renderer-vue'
 import { DependencyEngine, applyResult } from '@baklavajs/engine'
-import { type IEditorState, type IGraphState } from 'baklavajs'
+import { AbstractNode, type IEditorState, type IGraphState } from 'baklavajs'
 import '@baklavajs/themes/dist/syrup-dark.css'
 
 import EditorToolbar from '@/domains/UserInterface/components/GraphEditor/Toolbar/EditorToolbar.vue'
@@ -12,24 +12,29 @@ import CustomSidebar from '../components/GraphEditor/Sidebar/CustomSidebar.vue'
 
 import { BasicNode } from '@/domains/GraphEditor/nodes/Basics/BasicNode.ts'
 import { NoteNode } from '@/domains/GraphEditor/nodes/Basics/NoteNode.ts'
-import type { BasicNode as BasicNodeNodeConstructor } from '@/domains/GraphEditor/nodes/Basics/BasicNode.ts'
 import { Display2dNode } from '@/domains/GraphEditor/nodes/Display/Display2dNode.ts'
 
-type BasicNode = InstanceType<typeof BasicNodeNodeConstructor>
-
 const baklava = useBaklava()
-const editor = baklava.editor
-const token = Symbol('token')
 const settings = baklava.settings
-const BaklavaNode = Components.Node
+const editor = baklava.editor
 const engine = new DependencyEngine(editor)
-const graphTitle = 'current-graph'
-const graphName = 'numbercruncher-' + graphTitle
-const running = ref<boolean>(false)
 
-let step = 0
+const GRAPH_PREFIX = 'numbercruncher_graph_'
+const ROOT_NAME = 'root'
+const running = ref(false)
+let step: number = 0
 let ticker: number | null = null
 
+// Liste aller gespeicherten Graph-IDs (ohne Prefix)
+const availableGraphs = ref<string[]>([])
+// aktuell ausgewählter Graph-Name (ohne Prefix)
+const selectedGraph = ref<string>(ROOT_NAME)
+// Zwischenspeicher für neue Graph-Namen (Create)
+const newGraphName = ref('')
+// Zwischenspeicher für Umbenennen
+const renameGraphName = ref('')
+
+//  Settings
 settings.enableMinimap = true
 settings.displayValueOnHover = true
 
@@ -58,92 +63,176 @@ editor.registerNodeType(BasicNode, { category: 'Basics' })
 editor.registerNodeType(NoteNode, { category: 'Basics' })
 editor.registerNodeType(Display2dNode, { category: 'Display' })
 
-// build the global state object
-engine.hooks.gatherCalculationData.subscribe(token, () => {
-  return { step: step }
-})
+// add global values
+engine.hooks.gatherCalculationData.subscribe(Symbol(), () => ({ step }))
 
-// apply calculation results to the graph
-engine.events.afterRun.subscribe(token, (result) => {
+// apply simulation data for the next step
+engine.events.afterRun.subscribe(Symbol(), (result) => {
   engine.pause()
   applyResult(result, editor)
   engine.resume()
   step++
 })
 
-function handleStart() {
-  if (ticker === null) {
-    running.value = true
-    ticker = window.setInterval(() => {
-      engine.runOnce({ step })
-    }, 1000)
+// Computed für Disable-Zustände
+const canCreate = computed(
+  () => !!newGraphName.value.trim() && !availableGraphs.value.includes(newGraphName.value.trim()),
+)
+
+const isRootSelected = computed(() => selectedGraph.value === ROOT_NAME)
+const canDelete = computed(() => !isRootSelected.value)
+
+// Watcher: wenn Auswahl wechselt, vorbefüllen
+watch(selectedGraph, (newSel) => {
+  renameGraphName.value = newSel
+})
+
+/**
+ * Wrapper für Speichern+Rename:
+ * - Wenn der Benutzer im Rename-Input einen neuen, gültigen Namen eingetragen hat,
+ *   führ umbenennen durch (LocalStorage-Key umziehen, Auswahl aktualisieren).
+ * - Anschließend Graph-State speichern.
+ */
+function handleSave() {
+  const newName = renameGraphName.value.trim()
+  const oldName = selectedGraph.value
+  // prüfen, ob wir umbenennen müssen
+  if (
+    !isRootSelected.value &&
+    newName &&
+    newName !== oldName &&
+    !availableGraphs.value.includes(newName)
+  ) {
+    const oldId = GRAPH_PREFIX + oldName
+    const newId = GRAPH_PREFIX + newName
+    const data = localStorage.getItem(oldId)
+    if (data) {
+      // Key umziehen
+      localStorage.setItem(newId, data)
+      localStorage.removeItem(oldId)
+      // Liste und Auswahl updaten
+      refreshList()
+      selectedGraph.value = newName
+      editor.graph.id = newId
+      // Rename-Input zurücksetzen
+      renameGraphName.value = newName
+      console.log(`renamed: ${oldName} → ${newName}`)
+    }
   }
+  // dann speichern unter dem aktuellen (ggf. neuen) Namen
+  const id = GRAPH_PREFIX + selectedGraph.value
+  saveGraph(id)
 }
 
-function handleStop() {
-  if (ticker !== null) {
-    step = 0
-    running.value = false
-    clearInterval(ticker)
-    ticker = null
-  }
+// Hilfsfunktionen
+function saveGraph(id: string) {
+  const state = editor.save()
+  localStorage.setItem(id, JSON.stringify(state))
+  console.log(`${id} saved`)
+  refreshList()
 }
 
-function save() {
-  console.log('Saving to localstorage')
-  window.localStorage.setItem(graphName, JSON.stringify(editor.save()))
+function loadGraph(id: string) {
+  const raw = localStorage.getItem(id)
+  if (!raw) return
+  const state = JSON.parse(raw) as IEditorState
+  const warnings = editor.load(state)
+  if (warnings.length) console.warn('Load errors:', warnings)
+  else console.log(`${id} loaded`)
 }
 
-function load() {
-  const state = window.localStorage.getItem(graphName)
-
-  if (!state) {
-    return
-  }
-
-  try {
-    editor.load(JSON.parse(state))
-    console.log('Loaded state from localStorage')
-  } catch (e) {
-    console.error(e)
-    return
-  }
-}
-
-function resetGraph() {
+function resetGraph(id: string) {
   engine.stop()
   const graph: IGraphState = {
-    id: graphName,
+    id,
     nodes: [],
     connections: [],
     inputs: [],
     outputs: [],
-    panning: {
-      x: 400,
-      y: 250,
-    },
+    panning: { x: 400, y: 250 },
     scaling: 0.6,
   }
-  const state: IEditorState = {
-    graph,
-    graphTemplates: [],
-  }
-  editor.load(state)
+  editor.load({ graph, graphTemplates: [] })
 }
 
-function logGraph() {
-  console.log(editor.graph)
+function listSavedGraphs(): string[] {
+  return Object.keys(localStorage)
+    .filter((k) => k.startsWith(GRAPH_PREFIX))
+    .map((k) => k.slice(GRAPH_PREFIX.length))
 }
 
+function refreshList() {
+  availableGraphs.value = listSavedGraphs()
+}
+
+/**
+ * Löscht den aktuell ausgewählten Graph (außer Root)
+ * und lädt anschließend den Root-Graph.
+ */
+function deleteGraph() {
+  if (isRootSelected.value) return
+  // Sicherheits-Abfrage
+  if (!confirm(`delete "${selectedGraph.value}"?`)) return
+
+  const id = GRAPH_PREFIX + selectedGraph.value
+  localStorage.removeItem(id)
+  console.log(`${id} deleted`)
+  // Liste updaten und Root laden
+  refreshList()
+  selectedGraph.value = ROOT_NAME
+  loadGraph(GRAPH_PREFIX + ROOT_NAME)
+}
+
+// Lifecycle
 onMounted(() => {
-  load()
+  // sicherstellen, dass root existiert
+  if (!listSavedGraphs().includes(ROOT_NAME)) {
+    const rootId = GRAPH_PREFIX + ROOT_NAME
+    resetGraph(rootId)
+    editor.graph.id = rootId
+    saveGraph(rootId)
+  }
+  refreshList()
+  selectedGraph.value = ROOT_NAME
+  loadGraph(GRAPH_PREFIX + ROOT_NAME)
 })
 
 onBeforeUnmount(() => {
+  if (ticker !== null) clearInterval(ticker)
+})
+
+// Simulation
+function handleStart() {
+  if (ticker === null) {
+    running.value = true
+    ticker = window.setInterval(() => engine.runOnce({ step }), 1000)
+  }
+}
+function handleStop() {
   if (ticker !== null) {
     clearInterval(ticker)
+    ticker = null
+    running.value = false
+    step = 0
   }
-})
+}
+
+// Aktionen aus den Feldern
+function createNew() {
+  const name = newGraphName.value.trim()
+  if (!name || availableGraphs.value.includes(name)) return
+  const id = GRAPH_PREFIX + name
+  resetGraph(id)
+  editor.graph.id = id
+  saveGraph(id)
+  selectedGraph.value = name
+  newGraphName.value = ''
+}
+
+function onSelectChange(name: string) {
+  selectedGraph.value = name
+  loadGraph(GRAPH_PREFIX + name)
+}
 </script>
 
 <template>
@@ -151,73 +240,60 @@ onBeforeUnmount(() => {
     <template #toolbar>
       <EditorToolbar>
         <template #custom>
-          <button
-            v-if="!running"
-            class="baklava-toolbar-entry baklava-toolbar-button"
-            title="Start Simulation"
-            @click="handleStart"
-          >
-            ▶️
-          </button>
-
-          <button
-            v-if="running"
-            class="baklava-toolbar-entry baklava-toolbar-button green"
-            title="Stop Simulation"
-            @click="handleStop"
-          >
-            ⏹️
-          </button>
-
-          <button
-            class="baklava-toolbar-entry baklava-toolbar-button"
-            title="Save Flow"
-            @click="save"
-          >
+          <!-- Save / Reset / Simulation -->
+          <button class="baklava-toolbar-button" @click="handleSave">
             💾
           </button>
-
-          <button
-            class="baklava-toolbar-entry baklava-toolbar-button"
-            title="Reload last Save"
-            @click="load"
-          >
-            ♻️
+          <button class="baklava-toolbar-button" v-if="!running" @click="handleStart">
+            ▶️
           </button>
-
-          <button
-            class="baklava-toolbar-entry baklava-toolbar-button"
-            title="Reset Simulation"
-            @click="resetGraph"
-          >
+          <button class="baklava-toolbar-button green" v-if="running" @click="handleStop">
+            ⏹️
+          </button>
+          <button class="baklava-toolbar-button" @click="resetGraph(GRAPH_PREFIX + selectedGraph)">
             ↩️
           </button>
 
-          <button
-            class="baklava-toolbar-entry baklava-toolbar-button"
-            title="Log graph"
-            @click="logGraph"
+          <!-- Load -->
+          <select
+            v-model="selectedGraph"
+            class="baklava-toolbar-select"
+            @change="onSelectChange(selectedGraph)"
           >
-            🔎
+            <option v-for="name in availableGraphs" :key="name" :value="name">{{ name }}</option>
+          </select>
+
+          <!-- Rename -->
+          <input
+            :disabled="isRootSelected"
+            v-model="renameGraphName"
+            placeholder="rename to…"
+            class="baklava-toolbar-input"
+          />
+
+          <!-- Create -->
+          <input v-model="newGraphName" placeholder="Add new graph" class="baklava-toolbar-input" />
+          <button class="baklava-toolbar-button" :disabled="!canCreate" @click="createNew">
+            ✚ Create
           </button>
 
-          <button
-            class="baklava-toolbar-entry baklava-toolbar-button"
-            title="Home"
-            @click="router.push('/')"
-          >
-            🏡
-          </button>
+          <!-- Delete -->
+          <button class="baklava-toolbar-button" v-if="canDelete" @click="deleteGraph">🗑️</button>
+
+          <!-- Nav -->
+          <button class="baklava-toolbar-button" @click="router.push('/')">🏡</button>
         </template>
       </EditorToolbar>
     </template>
+
     <template #node="nodeProps">
-      <BaklavaNode
+      <Components.Node
         :key="nodeProps.node.id"
         v-bind="nodeProps"
-        :class="(nodeProps.node as BasicNode).inputs.type?.value"
+        :class="(nodeProps.node as AbstractNode).inputs.type?.value"
       />
     </template>
+
     <template #sidebar>
       <CustomSidebar />
     </template>
@@ -225,6 +301,77 @@ onBeforeUnmount(() => {
 </template>
 
 <style>
+#app-main .baklava-node {
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 5px 0px rgba(0, 0, 0, 0.2);
+}
+
+#app-main .baklava-node > .__title {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.85);
+}
+
+#app-main .baklava-select > .__selected,
+#app-main .baklava-num-input,
+#app-main .baklava-checkbox .__checkmark-container,
+#app-main .baklava-input {
+  border: 1px solid rgba(0, 0, 0, 0.65);
+  box-shadow: inset 1px 1px 3px 0px rgba(0, 0, 0, 0.5);
+}
+
+#app-main .baklava-node.--selected,
+#app-main .baklava-node:hover {
+  border-color: rgba(0, 0, 0, 0.401);
+}
+
+#app-main .baklava-slider > .__slider {
+  background-color: hsla(160, 100%, 37%, 1);
+}
+
+#app-main .baklava-node.--two-column > .__content {
+  column-gap: 25px;
+}
+
+.baklava-node.ActorNode {
+  background-color: rgba(52, 140, 217, 0.6);
+}
+
+.baklava-node.TestStepNode,
+.baklava-node.TestNode {
+  background-color: rgba(10, 137, 17, 0.4);
+}
+.baklava-node.FunctionNode,
+.baklava-node.ComponentNode {
+  background-color: rgba(255, 237, 34, 0.4);
+}
+
+.baklava-node.SceneNode {
+  background-color: rgba(70, 18, 116, 0.4);
+}
+
+.baklava-node.EventNode {
+  background-color: rgba(0, 204, 255, 0.6);
+}
+
+.baklava-node.StockNode,
+.baklava-node.EngineNode,
+.baklava-node.SystemNode {
+  background-color: rgba(255, 166, 0, 0.4);
+}
+
+#app-main .baklava-node-interface .__port {
+  width: 15px;
+  border-radius: 3px;
+  border: 1px solid #000000cb;
+  background: #d5d5d5;
+}
+
+#app-main .is-running .baklava-node-interface.--connected .__port {
+  background: #399839;
+}
+
+#app-main .is-running .baklava-node-interface .__port {
+  background: #8a3232;
+}
 .baklava-editor {
   position: absolute;
 }
@@ -237,5 +384,17 @@ onBeforeUnmount(() => {
 }
 .baklava-toolbar {
   padding: 0.5rem;
+}
+.baklava-toolbar-select {
+  margin-right: 0.5rem;
+  padding: 0.25rem;
+}
+.baklava-toolbar-input {
+  width: 6rem;
+  margin-right: 0.25rem;
+  padding: 0.25rem;
+}
+.baklava-toolbar-button {
+  margin-right: 0.5rem;
 }
 </style>

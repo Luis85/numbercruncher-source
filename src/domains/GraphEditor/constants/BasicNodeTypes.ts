@@ -9,6 +9,7 @@ export const BASIC_NODE_TYPES = [
   'SpawnNode',
   'InputMapNode',
   'TestNode',
+  'TestStepNode',
   'EventNode',
   'ViewNode',
   'FunctionNode',

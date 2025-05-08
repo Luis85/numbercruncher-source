@@ -43,6 +43,7 @@ export const Display2dNode = defineDynamicNode({
         type: 'Display2d',
         name: 'extraValue',
         value: inputs.extraValue * 2,
+        label: '',
       },
     ]
     return {

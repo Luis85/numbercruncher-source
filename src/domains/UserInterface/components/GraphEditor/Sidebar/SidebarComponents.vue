@@ -3,7 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { type BasicNodeViewModel } from '@/domains/GraphEditor'
 import type { BasicNode as BasicNodeNodeConstructor } from '@/domains/GraphEditor/nodes/Basics/BasicNode'
 import type { NodeInterface } from 'baklavajs'
-import { BASIC_NODE_COMPONENTS } from '@/domains/GraphEditor/constants'
+import { BASIC_NODE_COMPONENTS } from '@/domains/GraphEditor/constants/BasicNodeComponents'
 type BasicNode = InstanceType<typeof BasicNodeNodeConstructor>
 
 // Props & Emits

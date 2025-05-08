@@ -176,12 +176,12 @@ export const BASIC_NODE_CONFIG = {
     // add the selected components to the output
     for (const component of inputs.components) {
       const option = node.inputs[toPascalCase(component)]
-      if(!option) continue
+      if (!option) continue
       nodeOutput.values.push({
         type: 'Component',
         name: option.name + 'Component',
         label: option.name,
-        value: option.value
+        value: option.value,
       })
     }
 
@@ -214,7 +214,7 @@ export const BASIC_NODE_CONFIG = {
         type: option.type,
         name: toPascalCase(option.name),
         label: option.label ?? option.name,
-        value: optionValue
+        value: optionValue,
       })
     }
 

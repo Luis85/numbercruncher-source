@@ -47,6 +47,7 @@ export const ExtendedNode = defineDynamicNode({
         type: 'Extended',
         name: 'extraValue',
         value: inputs.extraValue * 2,
+        label: '',
       },
     ]
     return {

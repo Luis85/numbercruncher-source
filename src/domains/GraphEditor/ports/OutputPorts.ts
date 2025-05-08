@@ -1,6 +1,6 @@
 import { NodeInterface } from 'baklavajs'
 import type { NodeOutput } from '..'
-import { BASIC_NODE_EMPTY_OUTPUT_STATE } from '../constants'
+import { BASIC_NODE_EMPTY_OUTPUT_STATE } from '../constants/BasicNodeEmptyOutputState'
 
 export const BASIC_NODE_OUTPUTS = {
   // provide the calculated output for further consumption

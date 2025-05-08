@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import type { BasicNode as BasicNodeNodeConstructor } from '@/domains/GraphEditor/nodes/Basics/BasicNode'
 import type { NodeInterface } from 'baklavajs'
-import type { SidebarOption } from '@/domains/GraphEditor';
+import type { SidebarOption } from '@/domains/GraphEditor'
 type BasicNode = InstanceType<typeof BasicNodeNodeConstructor>
 
 // Props & Emits
@@ -23,18 +23,18 @@ watch(
   (modelState) => {
     const exports: string[] = modelState.exports
     const nodeInputs = props.node.inputs.view.value.inputs
-    if(!nodeInputs) return
+    if (!nodeInputs) return
 
     const newState: SidebarOption[] = []
-    for(const nodeId of exports) {
-      const nodeInput = nodeInputs.find(item => item.id === nodeId)
-      if(!nodeInput) continue
+    for (const nodeId of exports) {
+      const nodeInput = nodeInputs.find((item) => item.id === nodeId)
+      if (!nodeInput) continue
       newState.push({
         type: nodeInput.type,
         name: nodeInput.name,
         label: nodeInput.type + ' ' + nodeInput.name,
         value: nodeInput.id,
-        disabled: false
+        disabled: false,
       })
     }
     emit('update:modelValue', newState)
@@ -43,20 +43,20 @@ watch(
 )
 
 const options = computed(() => {
-  const nodeInputs: SidebarOption[] = props.node.inputs.view.value.inputs.map(item => {
+  const nodeInputs: SidebarOption[] = props.node.inputs.view.value.inputs.map((item) => {
     return {
       type: item.type,
       name: item.name,
       label: item.type + ' ' + item.name,
       value: item.id,
-      disabled: false
+      disabled: false,
     }
   })
   return nodeInputs
 })
 
 onMounted(() => {
-  state.value.exports = props.intf.value.map(item => {
+  state.value.exports = props.intf.value.map((item) => {
     return String(item.value)
   })
 })

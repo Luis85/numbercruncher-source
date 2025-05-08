@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import type { BasicNode as BasicNodeNodeConstructor } from '@/domains/GraphEditor/nodes/Basics/BasicNode'
-import { type BasicNodeInterface } from '@/domains/GraphEditor'
+import { type BasicNodeViewModel } from '@/domains/GraphEditor'
 import type { NodeInterface } from 'baklavajs'
 import { BASIC_GRAPH_EVENTS } from '@/domains/GraphEditor/constants'
 type BasicNode = InstanceType<typeof BasicNodeNodeConstructor>
@@ -10,7 +10,7 @@ type BasicNode = InstanceType<typeof BasicNodeNodeConstructor>
 const props = defineProps<{
   modelValue: string[]
   node: BasicNode
-  intf: NodeInterface<BasicNodeInterface>
+  intf: NodeInterface<BasicNodeViewModel>
 }>()
 
 const emit = defineEmits<{

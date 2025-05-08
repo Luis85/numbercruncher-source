@@ -1,4 +1,36 @@
-export interface BasicNodeInterface {
+export interface GraphGlobals {
+  step: number
+}
+
+export interface BasicNodeInputs {
+  type: string
+  parent: string | undefined
+  description: string
+  nodeView: string
+  width: number
+  height: number
+  scale: number
+  color: string
+
+  options: NodeOptionConfiguration[]
+  exports: string[]
+  tags: string[]
+  emits: string[]
+  subscribes: string[]
+  actions: string[]
+  components: string[]
+  resources: string[]
+  inputs: NodeOutput[]
+
+  view: BasicNodeViewModel
+}
+
+export interface BasicNodeOutputs {
+  children: string
+  outputs: NodeOutput
+}
+
+export interface BasicNodeViewModel {
   type: string
   description: string
   view: string
@@ -51,8 +83,4 @@ export interface NodeOptionConfiguration {
   name?: string
   value?: string | number | boolean
   default?: string | number | boolean
-}
-
-export interface BasicNodeGlobals {
-  step: number
 }

@@ -6,15 +6,22 @@ import {
   NumberInterface,
   TextInputInterface,
 } from 'baklavajs'
-import { type BasicNodeGlobals, type NodeOptionConfiguration, type NodeOutput } from '../..'
-import { basicNodeInputs, basicNodeOutputs, type BasicNodeInputs } from '../../ports'
+import {
+  type GraphGlobals,
+  type BasicNodeInputs,
+  type NodeOptionConfiguration,
+  type NodeOutput,
+  type BasicNodeOutputs,
+} from '../..'
+import { BASIC_NODE_INPUTS } from '../../ports/InputPorts'
+import { BASIC_NODE_OUTPUTS } from '../../ports/OutputPorts'
 
-export const basicNodeConfig = {
+export const BASIC_NODE_CONFIG = {
   type: 'BasicNode',
   title: '🧱New Node',
 
-  inputs: basicNodeInputs,
-  outputs: basicNodeOutputs,
+  inputs: BASIC_NODE_INPUTS,
+  outputs: BASIC_NODE_OUTPUTS,
 
   onCreate() {
     const node = this as unknown as AbstractNode
@@ -24,28 +31,27 @@ export const basicNodeConfig = {
 
   onUpdate(inputs: BasicNodeInputs) {
     const node = this as unknown as AbstractNode
+    const dynamicInputs: NodeOptionConfiguration[] = [...inputs.options]
     const dynamic: Record<string, () => TextInputInterface | NumberInterface | SelectInterface> = {}
-    const options: NodeOptionConfiguration[] = inputs.options
-    const newOptions: NodeOptionConfiguration[] = [...options]
-    const keys: string[] = []
 
+    // add selected components to the inputs
     for (const component of inputs.components) {
       const option = node.inputs[toPascalCase(component) + 'Component']
-      newOptions.push({
+      dynamicInputs.push({
         type: toPascalCase(component) + 'Component',
         name: toPascalCase(component),
         value: option ? option.value : '',
       })
     }
 
-    for (const option of newOptions) {
-      if (!option.type || !option.name) continue
+    // create the dynamic inputs out of the dynamicInputs array
+    for (const dynamicInput of dynamicInputs) {
+      if (!dynamicInput.type || !dynamicInput.name) continue
 
-      const key = toPascalCase(option.name)
-      const value = option.value ?? option.default
-      keys.push(key)
+      const key = toPascalCase(dynamicInput.name)
+      const value = dynamicInput.value ?? dynamicInput.default
 
-      switch (option.type) {
+      switch (dynamicInput.type) {
         case 'string':
           dynamic[key] = () => new TextInputInterface(key, typeof value === 'string' ? value : '')
           break
@@ -68,7 +74,11 @@ export const basicNodeConfig = {
       }
     }
 
-    // feed the viewmodel with values provided by baklava
+    /**
+     * @Todo: this section is not needed, why do we need to repopulate the viewmodel here?
+     * we can easily access the node in the renderer and grab the input state from there
+     * this creates some unnecessary roundtrips between the nodes and the view updates
+     */
     inputs.view.id = node.id
     inputs.view.title = node.title
     inputs.view.name = toPascalCase(node.title)
@@ -96,24 +106,37 @@ export const basicNodeConfig = {
 
     return {
       inputs: dynamic,
-      //forceUpdateInputs: keys
     }
   },
 
-  calculate(inputs: BasicNodeInputs, { globalValues }: { globalValues: BasicNodeGlobals }) {
+  /**
+   * # Node Calculate function
+   *
+   * ## Workflow
+   * - creates the node statistics
+   * - adds the selected components to the output
+   * - adds the selected inputs to the output
+   * - adds the created options to the output
+   *
+   * note: it will propably make sense to add a state-machine here
+   */
+  calculate(
+    inputs: BasicNodeInputs,
+    { globalValues }: { globalValues: GraphGlobals },
+  ): BasicNodeOutputs {
     const node = this as unknown as AbstractNode
     const { step } = globalValues as unknown as { step: number }
-    const size = inputs.inputs.length + 1 + (inputs.parent ? 1 : 0)
     const options: NodeOptionConfiguration[] = [...inputs.options]
+    const size = inputs.inputs.length + (inputs.parent ? 1 : 0) + 1
     let complexity = 0
 
+    // determine the paths complexity
     for (const input of inputs.inputs) {
       const metric = input.values.find(
         (item) => item.type === 'NodeStatistics' && item.name === 'complexity',
       )
       if (metric) complexity += Number(metric.value)
     }
-
     complexity += size
     complexity += inputs.emits.length
     complexity += inputs.subscribes.length
@@ -122,15 +145,7 @@ export const basicNodeConfig = {
     complexity += inputs.resources.length
     complexity += inputs.options.length
 
-    for (const component of inputs.components) {
-      const option = node.inputs[toPascalCase(component) + 'Component']
-      options.push({
-        type: toPascalCase(component) + 'Component',
-        name: toPascalCase(component),
-        value: option ? option.value : '',
-      })
-    }
-
+    // build the output object
     const nodeOutput: NodeOutput = {
       id: node.id,
       type: inputs.type,
@@ -154,6 +169,21 @@ export const basicNodeConfig = {
       ],
     }
 
+    // build the used components
+    for (const component of inputs.components) {
+      const option = node.inputs[toPascalCase(component) + 'Component']
+      options.push({
+        type: toPascalCase(component) + 'Component',
+        name: toPascalCase(component),
+        value: option ? option.value : '',
+      })
+    }
+
+    /**
+     * Build the exported nodes
+     * @todo: currently the system works out of the type as string[]. this does not work with multiple exports of the same type.
+     * needs to be redone to be object.id based
+     */
     for (const exportedInput of inputs.exports) {
       const input = inputs.inputs.find((item) => item.type === exportedInput)
       if (!input) continue
@@ -164,12 +194,19 @@ export const basicNodeConfig = {
       })
     }
 
+    /**
+     * Add the created options to the output
+     */
     for (const option of options) {
       if (!option.type || !option.name) continue
+      const optionInput = node.inputs[toPascalCase(option.name)]
+      if (!optionInput) continue
+
+      const optionValue = optionInput.value ?? option.default
       nodeOutput.values.push({
         type: option.type,
         name: toPascalCase(option.name),
-        value: node.inputs[toPascalCase(option.name)]?.value ?? '',
+        value: optionValue,
       })
     }
 
@@ -183,4 +220,4 @@ export const basicNodeConfig = {
   },
 }
 
-export const BasicNode = defineDynamicNode(basicNodeConfig)
+export const BasicNode = defineDynamicNode(BASIC_NODE_CONFIG)

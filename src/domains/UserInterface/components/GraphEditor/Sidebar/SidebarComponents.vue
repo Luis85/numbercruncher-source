@@ -1,16 +1,21 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { type BasicNodeInterface } from '@/domains/GraphEditor'
+import { type BasicNodeViewModel } from '@/domains/GraphEditor'
 import type { BasicNode as BasicNodeNodeConstructor } from '@/domains/GraphEditor/nodes/Basics/BasicNode'
 import type { NodeInterface } from 'baklavajs'
 import { BASIC_NODE_COMPONENTS } from '@/domains/GraphEditor/constants'
 type BasicNode = InstanceType<typeof BasicNodeNodeConstructor>
 
 // Props & Emits
+
+/**
+ * @TODO: this is not the right way to do it. props.intf is the concrete nodeInterface, it does not have the full NodeViewModel
+ * The whole Sidebar needs a rework as it gets way too much data and also not the correctly typed data
+ */
 const props = defineProps<{
   modelValue: string[]
   node: BasicNode
-  intf: NodeInterface<BasicNodeInterface>
+  intf: NodeInterface<BasicNodeViewModel>
 }>()
 
 const emit = defineEmits<{

@@ -7,13 +7,8 @@ import {
   TextareaInputInterface,
 } from 'baklavajs'
 import { markRaw } from 'vue'
-import type { NodeOutput, BasicNodeInterface, NodeOptionConfiguration } from '.'
-import {
-  BASIC_NODE_EMPTY_STATE,
-  BASIC_NODE_TYPES,
-  BASIC_NODE_VIEWS,
-  BASIC_NODE_EMPTY_OUTPUT_STATE,
-} from './constants'
+import type { NodeOutput, BasicNodeViewModel, NodeOptionConfiguration } from '..'
+import { BASIC_NODE_EMPTY_STATE, BASIC_NODE_TYPES, BASIC_NODE_VIEWS } from '../constants'
 
 import BasicNodeRenderer from '@/domains/UserInterface/components/GraphEditor/Node/BasicNode.vue'
 import SidebarTags from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarTags.vue'
@@ -26,14 +21,17 @@ import SidebarComponents from '@/domains/UserInterface/components/GraphEditor/Si
 import SidebarResources from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarResources.vue'
 import SidebarInputExports from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarInputExports.vue'
 
-export const basicNodeInputs = {
+export const BASIC_NODE_INPUTS = {
   // ports for other nodes to connect to
-  parent: () => new NodeInterface<string | undefined>('Parent', undefined),
   inputs: () => new NodeInterface<NodeOutput[]>('Inputs', []).use(allowMultipleConnections),
+  parent: () => new NodeInterface<string | undefined>('Parent', undefined),
 
-  // Node view port, acts as glue to the vue application
+  /**
+   * Node view port, acts as glue to the vue application
+   * @todo: rework the viewmodel. Its not needed to duplicate the input structure here as we can easily get the state out of the props.node
+   */
   view: () =>
-    new NodeInterface<BasicNodeInterface>('View', structuredClone(BASIC_NODE_EMPTY_STATE))
+    new NodeInterface<BasicNodeViewModel>('View', structuredClone(BASIC_NODE_EMPTY_STATE))
       .setComponent(markRaw(BasicNodeRenderer))
       .setPort(false),
 
@@ -59,11 +57,31 @@ export const basicNodeInputs = {
     new NumberInterface('Height', 0).setHidden(true).use(displayInSidebar, true).setPort(false),
   scale: () =>
     new NumberInterface('Scale', 1).setHidden(true).use(displayInSidebar, true).setPort(false),
+
+  // Node Shape
   color: () =>
     new NodeInterface<string>('Color', '')
       .setHidden(true)
       .use(displayInSidebar, true)
       .setComponent(markRaw(SidebarColor))
+      .setPort(false),
+  options: () =>
+    new NodeInterface<NodeOptionConfiguration[]>('Options', [])
+      .setHidden(true)
+      .use(displayInSidebar, true)
+      .setComponent(markRaw(SidebarOptions))
+      .setPort(false),
+  exports: () =>
+    new NodeInterface<string[]>('Output Composer', [])
+      .setHidden(true)
+      .use(displayInSidebar, true)
+      .setComponent(markRaw(SidebarInputExports))
+      .setPort(false),
+  components: () =>
+    new NodeInterface<string[]>('Components', [])
+      .setHidden(true)
+      .use(displayInSidebar, true)
+      .setComponent(markRaw(SidebarComponents))
       .setPort(false),
 
   // Event System
@@ -80,14 +98,11 @@ export const basicNodeInputs = {
       .setComponent(markRaw(SidebarSubscribeEvents))
       .setPort(false),
 
-  exports: () =>
-    new NodeInterface<string[]>('Output Composer', [])
-      .setHidden(true)
-      .use(displayInSidebar, true)
-      .setComponent(markRaw(SidebarInputExports))
-      .setPort(false),
-
-  // ECS Settings
+  /**
+   * ECS System
+   *
+   * @todo: needs rework to be object[] based instead of string[], the interfaces also need overhaul as they currently get the whole viewmodel which is not needed here.
+   */
   tags: () =>
     new NodeInterface<string[]>('Tags', [])
       .setHidden(true)
@@ -100,61 +115,10 @@ export const basicNodeInputs = {
       .use(displayInSidebar, true)
       .setComponent(markRaw(SidebarActions))
       .setPort(false),
-  components: () =>
-    new NodeInterface<string[]>('Components', [])
-      .setHidden(true)
-      .use(displayInSidebar, true)
-      .setComponent(markRaw(SidebarComponents))
-      .setPort(false),
   resources: () =>
     new NodeInterface<string[]>('Resources', [])
       .setHidden(true)
       .use(displayInSidebar, true)
       .setComponent(markRaw(SidebarResources))
       .setPort(false),
-  options: () =>
-    new NodeInterface<NodeOptionConfiguration[]>('Options', [])
-      .setHidden(true)
-      .use(displayInSidebar, true)
-      .setComponent(markRaw(SidebarOptions))
-      .setPort(false),
-}
-
-export const basicNodeOutputs = {
-  // propagate own id to a designated child
-  children: () => new NodeInterface<string>('Children', ''),
-  // provide the calculated output for further consumption
-  outputs: () => new NodeInterface<NodeOutput>('Outputs', { ...BASIC_NODE_EMPTY_OUTPUT_STATE }),
-}
-
-export interface BasicNodeInputs {
-  parent: string | undefined
-  inputs: NodeOutput[]
-  view: BasicNodeInterface
-  type: string
-  description: string
-  nodeView: string
-  width: number
-  height: number
-  scale: number
-  color: string
-  emits: string[]
-  subscribes: string[]
-  tags: string[]
-  exports: string[]
-  actions: string[]
-  components: string[]
-  resources: string[]
-  options: NodeOptionConfiguration[]
-}
-
-/** Die Ports unter `outputs:` */
-export interface BasicNodeOutputs {
-  children: string
-  outputs: NodeOutput
-}
-
-/** Dein globalValues-Objekt aus dem Graph */
-export interface BasicNodeGlobals {
-  step: number
 }

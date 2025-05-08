@@ -7,7 +7,7 @@ import {
   TextareaInputInterface,
 } from 'baklavajs'
 import { markRaw } from 'vue'
-import type { NodeOutput, BasicNodeViewModel, NodeOptionConfiguration } from '..'
+import type { NodeOutput, BasicNodeViewModel, NodeOptionConfiguration, SidebarOption } from '..'
 import { BASIC_NODE_EMPTY_STATE, BASIC_NODE_TYPES, BASIC_NODE_VIEWS } from '../constants'
 
 import BasicNodeRenderer from '@/domains/UserInterface/components/GraphEditor/Node/BasicNode.vue'
@@ -19,7 +19,7 @@ import SidebarOptions from '@/domains/UserInterface/components/GraphEditor/Sideb
 import SidebarColor from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarColor.vue'
 import SidebarComponents from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarComponents.vue'
 import SidebarResources from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarResources.vue'
-import SidebarInputExports from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarInputExports.vue'
+import SidebarOutputComposer from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarOutputComposer.vue'
 
 export const BASIC_NODE_INPUTS = {
   // ports for other nodes to connect to
@@ -72,10 +72,10 @@ export const BASIC_NODE_INPUTS = {
       .setComponent(markRaw(SidebarOptions))
       .setPort(false),
   exports: () =>
-    new NodeInterface<string[]>('Output Composer', [])
+    new NodeInterface<SidebarOption[]>('Output Composer', [])
       .setHidden(true)
       .use(displayInSidebar, true)
-      .setComponent(markRaw(SidebarInputExports))
+      .setComponent(markRaw(SidebarOutputComposer))
       .setPort(false),
   components: () =>
     new NodeInterface<string[]>('Components', [])

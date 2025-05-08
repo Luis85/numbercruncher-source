@@ -13,7 +13,7 @@ export interface BasicNodeInputs {
   color: string
 
   options: NodeOptionConfiguration[]
-  exports: string[]
+  exports: SidebarOption[]
   tags: string[]
   emits: string[]
   subscribes: string[]
@@ -42,7 +42,7 @@ export interface BasicNodeViewModel {
   scale: number
 
   options: NodeOptionConfiguration[]
-  exports: string[]
+  exports: SidebarOption[]
   tags: string[]
   emits: string[]
   subscribes: string[]
@@ -63,24 +63,36 @@ export interface BasicNodeViewModel {
     | string[]
     | NodeOutput[]
     | NodeOptionConfiguration[]
+    | SidebarOption[]
     | undefined
 }
 
 export interface NodeOutput {
   type: string
   id: string
+  name: string
   parent?: string
   values: NodeInput[]
 }
 export interface NodeInput {
   type: string
   name: string
+  label: string
   value: string | number | boolean | undefined
 }
 
 export interface NodeOptionConfiguration {
   type?: string
   name?: string
+  label?: string
   value?: string | number | boolean
   default?: string | number | boolean
+}
+
+export interface SidebarOption {
+  type: string
+  name: string
+  label: string
+  disabled: boolean
+  value?: string | number | boolean | SidebarOption[] | undefined
 }

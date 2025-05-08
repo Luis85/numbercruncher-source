@@ -149,33 +149,39 @@ export const BASIC_NODE_CONFIG = {
     const nodeOutput: NodeOutput = {
       id: node.id,
       type: inputs.type,
+      name: node.title,
       parent: inputs.parent,
       values: [
         {
           type: 'NodeStatistics',
           name: 'inputCount',
+          label: 'statistics',
           value: inputs.inputs.length,
         },
         {
           type: 'NodeStatistics',
           name: 'size',
+          label: 'statistics',
           value: size,
         },
         {
           type: 'NodeStatistics',
           name: 'complexity',
+          label: 'statistics',
           value: complexity,
         },
       ],
     }
 
-    // build the used components
+    // add the selected components to the output
     for (const component of inputs.components) {
-      const option = node.inputs[toPascalCase(component) + 'Component']
-      options.push({
-        type: toPascalCase(component) + 'Component',
-        name: toPascalCase(component),
-        value: option ? option.value : '',
+      const option = node.inputs[toPascalCase(component)]
+      if(!option) continue
+      nodeOutput.values.push({
+        type: 'Component',
+        name: option.name + 'Component',
+        label: option.name,
+        value: option.value
       })
     }
 
@@ -185,11 +191,12 @@ export const BASIC_NODE_CONFIG = {
      * needs to be redone to be object.id based
      */
     for (const exportedInput of inputs.exports) {
-      const input = inputs.inputs.find((item) => item.type === exportedInput)
+      const input = inputs.inputs.find((item) => item.id === exportedInput.value)
       if (!input) continue
       nodeOutput.values.push({
         type: 'Export',
         name: input.type,
+        label: input.name,
         value: input.id,
       })
     }
@@ -206,7 +213,8 @@ export const BASIC_NODE_CONFIG = {
       nodeOutput.values.push({
         type: option.type,
         name: toPascalCase(option.name),
-        value: optionValue,
+        label: option.label ?? option.name,
+        value: optionValue
       })
     }
 

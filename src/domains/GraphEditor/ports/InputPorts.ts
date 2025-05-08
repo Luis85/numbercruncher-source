@@ -5,6 +5,7 @@ import {
   displayInSidebar,
   NumberInterface,
   TextareaInputInterface,
+  TextInputInterface,
 } from 'baklavajs'
 import { markRaw } from 'vue'
 import type { NodeOutput, BasicNodeViewModel, NodeOptionConfiguration, SidebarOption } from '..'
@@ -60,6 +61,8 @@ export const BASIC_NODE_INPUTS = {
     new NumberInterface('Height', 0).setHidden(true).use(displayInSidebar, true).setPort(false),
   scale: () =>
     new NumberInterface('Scale', 1).setHidden(true).use(displayInSidebar, true).setPort(false),
+  schema: () =>
+    new TextInputInterface('Schema', '').setHidden(true).use(displayInSidebar, true).setPort(false),
 
   // Node Shape
   color: () =>
@@ -104,7 +107,7 @@ export const BASIC_NODE_INPUTS = {
   /**
    * ECS System
    *
-   * @todo: needs rework to be object[] based instead of string[], the interfaces also need overhaul as they currently get the whole viewmodel which is not needed here.
+   * @todo: needs rework to be object[] based instead of string[], the interfaces also needs overhaul as they currently get the whole viewmodel which is not needed here.
    */
   tags: () =>
     new NodeInterface<string[]>('Tags', [])

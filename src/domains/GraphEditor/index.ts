@@ -11,6 +11,7 @@ export interface BasicNodeInputs {
   height: number
   scale: number
   color: string
+  schema: string
 
   options: NodeOptionConfiguration[]
   exports: SidebarOption[]
@@ -36,6 +37,7 @@ export interface BasicNodeViewModel {
   view: string
   name: string
   title: string
+  schema: string
   step: number
   width: number
   height: number

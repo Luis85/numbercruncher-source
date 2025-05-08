@@ -92,6 +92,7 @@ export const BASIC_NODE_CONFIG = {
     inputs.view.height = inputs.height
     inputs.view.scale = inputs.scale
     inputs.view.parent = inputs.parent
+    inputs.view.schema = inputs.schema
 
     inputs.view.emits = inputs.emits
     inputs.view.subscribes = inputs.subscribes

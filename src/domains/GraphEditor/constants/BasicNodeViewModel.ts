@@ -19,4 +19,5 @@ export const BASIC_NODE_EMPTY_STATE: BasicNodeViewModel = {
   height: 0,
   scale: 1,
   outputs: undefined,
+  schema: ''
 }

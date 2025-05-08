@@ -80,10 +80,6 @@ export default defineComponent({
       </div>
     </div>
 
-    <div v-if="node">
-      <p>Id: {{ `${node.id}` }}</p>
-    </div>
-
     <div v-for="intf in displayedInterfaces" :key="intf.id" class="__interface">
       <component :is="intf.component" v-model="intf.value" :node="node" :intf="intf" />
     </div>

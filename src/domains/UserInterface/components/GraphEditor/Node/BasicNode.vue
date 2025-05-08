@@ -29,6 +29,7 @@ const complexity = computed(() => {
 <template>
   <hr />
   <section class="head mb-3">
+    <p class="mb-2"><strong>Id:</strong> {{ modelValue.id }}</p>
     <p class="mb-2"><strong>Type:</strong> {{ modelValue.type }}</p>
     <p class="mb-2"><strong>View:</strong> {{ modelValue.view }}</p>
     <p class="mb-2"><strong>Emits:</strong> {{ modelValue.emits.length }}</p>

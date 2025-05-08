@@ -2,13 +2,13 @@ import { defineDynamicNode } from 'baklavajs'
 import { NumberInterface, TextInputInterface } from 'baklavajs'
 import { BASIC_NODE_CONFIG } from '../Basics/BasicNode'
 
-export const ExtendedNode = defineDynamicNode({
+export const DynamicNodeTemplate = defineDynamicNode({
   // 1: komplett alles von basicNodeConfig übernehmen
   ...BASIC_NODE_CONFIG,
 
   // 2: aber type/title überschreiben
-  type: 'ExtendedNode',
-  title: '🚀 Extended Node',
+  type: 'DynamicNodeTemplate',
+  title: '🚀 DynamicNodeTemplate',
 
   // 3: neue Ports mergen
   inputs: {

@@ -1,53 +1,30 @@
-import { defineDynamicNode } from 'baklavajs'
-import { BASIC_NODE_CONFIG } from '../Basics/BasicNode'
+import { Node, NodeInterface, type CalculateFunction, allowMultipleConnections } from 'baklavajs'
+import type { NodeOutput } from '../..'
+import type { Display2dInputs, Display2dOutputs } from '.'
+import { markRaw } from 'vue'
+import Display2dRenderer from '@/domains/UserInterface/components/GraphEditor/Renderer/Display2dRenderer.vue'
 
-export const Display2dNode = defineDynamicNode({
-  // 1: komplett alles von basicNodeConfig übernehmen
-  ...BASIC_NODE_CONFIG,
+export class Display2dNode extends Node<Display2dInputs, Display2dOutputs> {
+  public type = 'Display2dNode'
 
-  // 2: aber type/title überschreiben
-  type: 'Display2dNode',
-  title: '💻Display 2d',
+  public constructor() {
+    super()
+    this.title = '💻Display 2d'
+    this.width = 800
+    this.twoColumn = true
+    this.initializeIo()
+  }
 
-  // 3: neue Ports mergen
-  inputs: {
-    ...BASIC_NODE_CONFIG.inputs,
-  },
-  outputs: {
-    ...BASIC_NODE_CONFIG.outputs,
-  },
+  public inputs = {
+    data: new NodeInterface<NodeOutput[]>('Inputs', []).use(allowMultipleConnections),
+    renderer: new NodeInterface<number>('Renderer', 0).setPort(false).setComponent(markRaw(Display2dRenderer)),
+  }
 
-  // 4: onCreate-Handler erweitern
-  onCreate() {
-    BASIC_NODE_CONFIG.onCreate!.call(this)
-    // eigene Logik …
-  },
+  public outputs = {
+    output: new NodeInterface('Output', 0),
+  }
 
-  // 5: onUpdate-Handler erweitern
-  onUpdate(inputs) {
-    const base = BASIC_NODE_CONFIG.onUpdate!.call(this, inputs)
-    return {
-      inputs: {
-        ...base.inputs,
-      },
-      // forceUpdate usw. von base ggf. beibehalten …
-    }
-  },
-
-  // 6: calculate erweitern
-  calculate(inputs, ctx) {
-    const baseOut = BASIC_NODE_CONFIG.calculate!.call(this, inputs, ctx)
-    baseOut.outputs.values = [
-      ...baseOut.outputs.values,
-      {
-        type: 'Display2d',
-        name: 'extraValue',
-        value: inputs.extraValue * 2,
-        label: '',
-      },
-    ]
-    return {
-      ...baseOut,
-    }
-  },
-})
+  public calculate: CalculateFunction<Display2dInputs, Display2dOutputs> = ({ data }) => {
+    return { output: data.length }
+  }
+}

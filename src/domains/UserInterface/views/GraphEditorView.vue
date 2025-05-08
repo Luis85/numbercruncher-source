@@ -241,12 +241,8 @@ function onSelectChange(name: string) {
       <EditorToolbar>
         <template #custom>
           <!-- Save / Reset / Simulation -->
-          <button class="baklava-toolbar-button" @click="handleSave">
-            💾
-          </button>
-          <button class="baklava-toolbar-button" v-if="!running" @click="handleStart">
-            ▶️
-          </button>
+          <button class="baklava-toolbar-button" @click="handleSave">💾</button>
+          <button class="baklava-toolbar-button" v-if="!running" @click="handleStart">▶️</button>
           <button class="baklava-toolbar-button green" v-if="running" @click="handleStop">
             ⏹️
           </button>

@@ -1,4 +1,4 @@
-import type { Color } from 'excalibur'
+import type { Color, Vector } from 'excalibur'
 import type { NodeOutput } from '../..'
 
 export interface Display2dInputs {
@@ -30,4 +30,7 @@ export interface Display2dRendererActorConfig {
   width: number
   height: number
   color: Color
+  pos: Vector
+  tags: string[]
+  components: string[]
 }

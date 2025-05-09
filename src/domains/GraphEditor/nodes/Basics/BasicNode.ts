@@ -161,6 +161,12 @@ export const BASIC_NODE_CONFIG = {
       width: inputs.width,
       height: inputs.height,
       color: inputs.color,
+      x: inputs.x,
+      y: inputs.y,
+      z: inputs.z,
+      scale: inputs.scale,
+      opacity: 1,
+      visible: true,
       values: [],
     }
 

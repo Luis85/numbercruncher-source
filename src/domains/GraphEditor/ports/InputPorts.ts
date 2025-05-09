@@ -61,6 +61,12 @@ export const BASIC_NODE_INPUTS = {
     new NumberInterface('Height', 0).setHidden(true).use(displayInSidebar, true).setPort(false),
   scale: () =>
     new NumberInterface('Scale', 1).setHidden(true).use(displayInSidebar, true).setPort(false),
+  x: () =>
+    new NumberInterface('X', 0).setHidden(true).use(displayInSidebar, true).setPort(false),
+  y: () =>
+    new NumberInterface('Y', 0).setHidden(true).use(displayInSidebar, true).setPort(false),
+  z: () =>
+    new NumberInterface('Z', 0).setHidden(true).use(displayInSidebar, true).setPort(false),
   schema: () =>
     new TextInputInterface('Schema', '').setHidden(true).use(displayInSidebar, true).setPort(false),
 

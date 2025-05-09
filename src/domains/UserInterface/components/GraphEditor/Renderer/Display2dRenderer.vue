@@ -5,7 +5,7 @@ import type {
 } from '@/domains/GraphEditor/nodes/Display'
 import type { Display2dNode } from '@/domains/GraphEditor/nodes/Display/Display2dNode'
 import { DISPLAY2D_EMPTY_STATE } from '@/domains/GraphEditor/constants/Display2dEmptyState'
-import { Actor, Color, Engine, PointerScope, Scene, type ActorArgs } from 'excalibur'
+import { Actor, Color, Engine, PointerScope, Scene, Vector, type ActorArgs } from 'excalibur'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { NodeInterface, useGraph } from 'baklavajs'
 import type { BasicNodeOutputPorts, NodeOutput } from '@/domains/GraphEditor'
@@ -37,7 +37,7 @@ function buildEngine() {
       backgroundColor: Color.fromHex('#00000099'),
     })
 
-    addScene('iteration target')
+    addIterationTargetScene('iteration target')
 
     engine.value.debug.entity.showName = true
     engine.value.debug.entity.showAll = true
@@ -46,13 +46,9 @@ function buildEngine() {
   }
 }
 
-function addScene(name: string) {
+function addIterationTargetScene(name: string) {
   if (!engine.value) return
   const scene = new Scene()
-  engine.value.addScene(name, addActors(scene))
-}
-
-function addActors(scene: Scene): Scene {
   const playerActor: ActorArgs = {
     name: 'Player Actor',
     width: 25,
@@ -92,8 +88,7 @@ function addActors(scene: Scene): Scene {
       .moveTo(340, 500, 1100)
       .delay(800)
   })
-
-  return scene
+  engine.value.addScene(name, scene)
 }
 
 function startEngine() {
@@ -103,11 +98,10 @@ function startEngine() {
   })
 }
 
-function changeScene(name: string) {
+async function changeScene(name: string) {
   if (!engine.value) return
-  engine.value.goToScene(name).then(() => {
-    console.log('switched to scene: ' + name)
-  })
+  await engine.value.goToScene(name)
+  console.log('switched to scene: ' + name)
 }
 
 function toggleDebug() {
@@ -116,26 +110,26 @@ function toggleDebug() {
   engine.value.toggleDebug()
 }
 
-onMounted(() => {
-  buildEngine()
-})
-
-onBeforeUnmount(() => {
-  if (!engine.value) return
-  engine.value.stop()
-  engine.value.dispose()
-})
-
 // generated gamestate for excalibur out of the provided config from baklava
 // remember: in order to save baklava state the nodes needs to be serializable, therefore we build the scene here and not in the node
 watch(
   () => props.modelValue.scenes,
-  (newScenes) => {
+  async (newScenes) => {
+    if(!engine.value) return
+
     // Szenen entfernen
-    const keepNames = newScenes.map((s) => s.id)
+    const keepNames = newScenes.map((scene) => scene.id)
     for (const sceneName of Array.from(sceneMap.keys())) {
       if (!keepNames.includes(sceneName)) {
+        if(engine.value.currentSceneName === sceneName) {
+          await changeScene('root')
+        }
+        const tobedeletedScene = sceneMap.get(sceneName)
+        if(!tobedeletedScene) continue
+        tobedeletedScene.clear()
+        engine.value.removeScene(sceneName)
         sceneMap.delete(sceneName)
+        actorMap.clear()
       }
     }
 
@@ -164,6 +158,7 @@ watch(
         const actorNodeOutputs = actorNode.outputs as unknown as BasicNodeOutputPorts
         const actorNodeCalculated = actorNodeOutputs.outputs as unknown as NodeInterface
         const actorNodeConfig = actorNodeCalculated.value as unknown as NodeOutput
+        const actorComponents = actorNodeConfig.values.filter(item => item.type === 'Component')
 
         const color = actorNodeConfig.color.length >= 6 ? Color.fromHex(actorNodeConfig.color) : Color.ExcaliburBlue
         const actorConfig: Display2dRendererActorConfig = {
@@ -174,6 +169,9 @@ watch(
           width: actorNodeConfig.width,
           height: actorNodeConfig.height,
           color: color,
+          pos: new Vector(actorNodeConfig.x, actorNodeConfig.y),
+          components: actorComponents.map(item => item.name),
+          tags: []
         }
         actors.push(actorConfig)
       }
@@ -202,18 +200,29 @@ watch(
         }
       }
       // neue Actors erzeugen
-      for (const actorState of newScene.actors) {
-        if (!actorMap.has(actorState.id)) {
-          const actor = new Actor(actorState)
-          actorMap.set(actorState.id, actor)
+      for (const actorConfig of newScene.actors) {
+        if (!actorMap.has(actorConfig.id)) {
+          const actorArgs: ActorArgs = {...actorConfig}
+          actorArgs.z = 0
+          const actor = new Actor(actorArgs)
+          actorMap.set(actorConfig.id, actor)
           scene.add(actor)
-          engine.value?.currentScene.camera.strategy.lockToActor(actor)
         }
       }
     }
   },
   { deep: true },
 )
+
+onMounted(() => {
+  buildEngine()
+})
+
+onBeforeUnmount(() => {
+  if (!engine.value) return
+  engine.value.stop()
+  engine.value.dispose()
+})
 </script>
 
 <template>
@@ -241,6 +250,16 @@ watch(
       </section>
 
       <section id="excalibur-debug" v-if="engine.isDebug">
+        <p><strong>Current Scene</strong></p>
+        <div>
+          <p>name: {{ engine.currentSceneName }}<br>entities: {{ engine.currentScene.entities.length }}</p>
+        </div>
+
+        <p><strong>Scene Actors</strong></p>
+        <div v-for="actor in engine.currentScene.actors" :key="actor.id">
+          <p>id: {{ actor.id }}<br>name: {{ actor.name }}</p>
+        </div>
+
         <p><strong>Provided Scenes</strong></p>
         <div v-for="item in modelValue.scenes" :key="item.id">
           <pre>{{ item }}</pre>

@@ -7,11 +7,15 @@ export interface BasicNodeInputPorts {
   parent: string | undefined
   description: string
   nodeView: string
+  color: string
+  schema: string
+
   width: number
   height: number
   scale: number
-  color: string
-  schema: string
+  x: number
+  y: number
+  z: number
 
   options: NodeOptionConfiguration[]
   exports: SidebarOption[]
@@ -77,6 +81,12 @@ export interface NodeOutput {
   width: number
   height: number
   color: string
+  scale: number
+  x: number
+  y: number
+  z: number
+  opacity: number
+  visible: boolean
   values: NodeInput[]
 }
 export interface NodeInput {

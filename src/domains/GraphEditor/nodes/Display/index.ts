@@ -31,6 +31,7 @@ export interface Display2dRendererActorConfig {
   height: number
   color: Color
   pos: Vector
+  z: number
   tags: string[]
   components: string[]
 }

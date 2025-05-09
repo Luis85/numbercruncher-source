@@ -9,6 +9,7 @@ import '@baklavajs/themes/dist/syrup-dark.css'
 
 import { BasicNode } from '@/domains/GraphEditor/nodes/Basics/BasicNode.ts'
 import { NoteNode } from '@/domains/GraphEditor/nodes/Basics/NoteNode.ts'
+import { TaskNode } from '@/domains/GraphEditor/nodes/Basics/TaskNode.ts'
 import { Display2dNode } from '@/domains/GraphEditor/nodes/Display/Display2dNode.ts'
 
 import EditorToolbar from '@/domains/UserInterface/components/GraphEditor/Toolbar/EditorToolbar.vue'
@@ -62,6 +63,7 @@ settings.contextMenu.additionalItems = [
 // node registry
 editor.registerNodeType(BasicNode, { category: 'Basics' })
 editor.registerNodeType(NoteNode, { category: 'Basics' })
+editor.registerNodeType(TaskNode, { category: 'Basics' })
 editor.registerNodeType(Display2dNode, { category: 'Display' })
 
 // add global values
@@ -287,7 +289,7 @@ function onSelectChange(name: string) {
       <Components.Node
         :key="nodeProps.node.id"
         v-bind="nodeProps"
-        :class="(nodeProps.node as AbstractNode).inputs.type?.value"
+        :class="(nodeProps.node as AbstractNode).inputs.type?.value ?? nodeProps.node.type"
       />
     </template>
 
@@ -336,6 +338,8 @@ function onSelectChange(name: string) {
 .baklava-node.TestNode {
   background-color: rgba(10, 137, 17, 0.4);
 }
+.baklava-node.ActivityNode,
+.baklava-node.TaskNode,
 .baklava-node.FunctionNode,
 .baklava-node.ComponentNode {
   background-color: rgba(255, 237, 34, 0.4);
@@ -349,6 +353,7 @@ function onSelectChange(name: string) {
   background-color: rgba(0, 204, 255, 0.6);
 }
 
+.baklava-node.JobToBeDoneNode,
 .baklava-node.StockNode,
 .baklava-node.EngineNode,
 .baklava-node.SystemNode {

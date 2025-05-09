@@ -18,7 +18,7 @@ import { BASIC_NODE_OUTPUTS } from '../../ports/OutputPorts'
 
 export const BASIC_NODE_CONFIG = {
   type: 'BasicNode',
-  title: '🧱New Node',
+  title: '🧱New Basic Node',
 
   inputs: BASIC_NODE_INPUTS,
   outputs: BASIC_NODE_OUTPUTS,

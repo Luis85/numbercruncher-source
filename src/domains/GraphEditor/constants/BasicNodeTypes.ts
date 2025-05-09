@@ -21,4 +21,6 @@ export const BASIC_NODE_TYPES = [
   'DeliverableNode',
   'PiniaStoreNode',
   'StateMachineNode',
+  'JobToBeDoneNode',
+  'ActivityNode',
 ]

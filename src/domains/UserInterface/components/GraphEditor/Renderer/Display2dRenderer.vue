@@ -165,6 +165,7 @@ watch(
         const actorNodeCalculated = actorNodeOutputs.outputs as unknown as NodeInterface
         const actorNodeConfig = actorNodeCalculated.value as unknown as NodeOutput
 
+        const color = actorNodeConfig.color.length >= 6 ? Color.fromHex(actorNodeConfig.color) : Color.ExcaliburBlue
         const actorConfig: Display2dRendererActorConfig = {
           id: actorNodeConfig.id,
           name: actorNodeConfig.name,
@@ -172,9 +173,7 @@ watch(
           label: actorNodeConfig.name,
           width: actorNodeConfig.width,
           height: actorNodeConfig.height,
-          x: 250,
-          y: 250,
-          color: Color.ExcaliburBlue,
+          color: color,
         }
         actors.push(actorConfig)
       }

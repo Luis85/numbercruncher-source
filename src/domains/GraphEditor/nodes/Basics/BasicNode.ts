@@ -158,6 +158,9 @@ export const BASIC_NODE_CONFIG = {
       type: inputs.type,
       name: node.title,
       parent: inputs.parent,
+      width: inputs.width,
+      height: inputs.height,
+      color: inputs.color,
       values: [],
     }
 

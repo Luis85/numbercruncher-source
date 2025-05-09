@@ -74,6 +74,9 @@ export interface NodeOutput {
   id: string
   name: string
   parent?: string
+  width: number
+  height: number
+  color: string
   values: NodeInput[]
 }
 export interface NodeInput {

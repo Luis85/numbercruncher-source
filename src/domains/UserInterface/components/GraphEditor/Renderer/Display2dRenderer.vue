@@ -9,8 +9,6 @@ import { Actor, Color, Engine, PointerScope, Scene, type ActorArgs } from 'excal
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { NodeInterface, useGraph } from 'baklavajs'
 import type { BasicNodeOutputPorts, NodeOutput } from '@/domains/GraphEditor'
-import { toPascalCase } from '@/utils/toPascalCase'
-
 const props = defineProps<{
   modelValue: Display2dRendererState
   node: Display2dNode
@@ -152,23 +150,34 @@ watch(
       const sceneStateOutputs = sceneNode.outputs as unknown as BasicNodeOutputPorts
       const sceneCalculated = sceneStateOutputs.outputs as unknown as NodeInterface
       const sceneConfig = sceneCalculated.value as unknown as NodeOutput
+      const actors: Display2dRendererActorConfig[] = []
+      const actorReferences = sceneConfig.values.filter(
+        (item) => item.type === 'Export' && item.name === 'ActorNode',
+      )
 
-      const actors = sceneConfig.values
-        .filter((item) => item.type === 'Export' && item.name === 'ActorNode')
-        .map((actor) => {
-          const actorConfig: Display2dRendererActorConfig = {
-            id: toPascalCase(String(actor.value)),
-            name: actor.name,
-            type: actor.type,
-            label: actor.label,
-            width: 25,
-            height: 25,
-            x: 250,
-            y: 250,
-            color: Color.ExcaliburBlue,
-          }
-          return actorConfig
-        })
+      for (const actorReference of actorReferences) {
+        const actorNodeId = String(actorReference.value)
+        const actorNode = graph.value.findNodeById(actorNodeId)
+
+        if (!actorNode) continue
+
+        const actorNodeOutputs = actorNode.outputs as unknown as BasicNodeOutputPorts
+        const actorNodeCalculated = actorNodeOutputs.outputs as unknown as NodeInterface
+        const actorNodeConfig = actorNodeCalculated.value as unknown as NodeOutput
+
+        const actorConfig: Display2dRendererActorConfig = {
+          id: actorNodeConfig.id,
+          name: actorNodeConfig.name,
+          type: actorNodeConfig.type,
+          label: actorNodeConfig.name,
+          width: actorNodeConfig.width,
+          height: actorNodeConfig.height,
+          x: 250,
+          y: 250,
+          color: Color.ExcaliburBlue,
+        }
+        actors.push(actorConfig)
+      }
 
       const newScene = {
         id: sceneConfig.id,
@@ -195,11 +204,11 @@ watch(
       }
       // neue Actors erzeugen
       for (const actorState of newScene.actors) {
-        if (!actorState.id) return
         if (!actorMap.has(actorState.id)) {
           const actor = new Actor(actorState)
           actorMap.set(actorState.id, actor)
           scene.add(actor)
+          engine.value?.currentScene.camera.strategy.lockToActor(actor)
         }
       }
     }

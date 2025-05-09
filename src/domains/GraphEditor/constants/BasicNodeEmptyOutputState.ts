@@ -5,4 +5,7 @@ export const BASIC_NODE_EMPTY_OUTPUT_STATE: NodeOutput = {
   type: 'NodeOutput',
   values: [],
   name: '',
+  width: 0,
+  height: 0,
+  color: '',
 }

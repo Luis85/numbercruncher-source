@@ -7,12 +7,12 @@ import { DependencyEngine, applyResult } from '@baklavajs/engine'
 import { AbstractNode, type IEditorState, type IGraphState } from 'baklavajs'
 import '@baklavajs/themes/dist/syrup-dark.css'
 
-import EditorToolbar from '@/domains/UserInterface/components/GraphEditor/Toolbar/EditorToolbar.vue'
-import CustomSidebar from '../components/GraphEditor/Sidebar/CustomSidebar.vue'
-
 import { BasicNode } from '@/domains/GraphEditor/nodes/Basics/BasicNode.ts'
 import { NoteNode } from '@/domains/GraphEditor/nodes/Basics/NoteNode.ts'
 import { Display2dNode } from '@/domains/GraphEditor/nodes/Display/Display2dNode.ts'
+
+import EditorToolbar from '@/domains/UserInterface/components/GraphEditor/Toolbar/EditorToolbar.vue'
+import CustomSidebar from '../components/GraphEditor/Sidebar/CustomSidebar.vue'
 
 const baklava = useBaklava()
 const settings = baklava.settings
@@ -43,11 +43,12 @@ settings.sidebar.enabled = true
 
 settings.nodes.resizable = true
 settings.nodes.defaultWidth = 300
-settings.nodes.maxWidth = 1200
+settings.nodes.maxWidth = 1800
 settings.nodes.minWidth = 300
 
 settings.palette.enabled = true
 
+// build additional context menu
 settings.contextMenu.additionalItems = [
   { isDivider: true },
   { label: 'Zoom Fit', command: Commands.ZOOM_TO_FIT_GRAPH_COMMAND },
@@ -201,7 +202,7 @@ onBeforeUnmount(() => {
   if (ticker !== null) clearInterval(ticker)
 })
 
-// Simulation
+// Graph Execution
 function handleStart() {
   if (ticker === null) {
     running.value = true

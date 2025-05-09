@@ -8,10 +8,10 @@ import {
 } from 'baklavajs'
 import {
   type GraphGlobals,
-  type BasicNodeInputs,
+  type BasicNodeInputPorts,
   type NodeOptionConfiguration,
   type NodeOutput,
-  type BasicNodeOutputs,
+  type BasicNodeOutputPorts,
 } from '../..'
 import { BASIC_NODE_INPUTS } from '../../ports/InputPorts'
 import { BASIC_NODE_OUTPUTS } from '../../ports/OutputPorts'
@@ -35,7 +35,7 @@ export const BASIC_NODE_CONFIG = {
    * prepares all the dynamic input nodes and syncs the view with them
    *
    */
-  onUpdate(inputs: BasicNodeInputs) {
+  onUpdate(inputs: BasicNodeInputPorts) {
     const node = this as unknown as AbstractNode
     const dynamicInputs: NodeOptionConfiguration[] = [...inputs.options]
     const dynamic: Record<string, () => TextInputInterface | NumberInterface | SelectInterface> = {}
@@ -128,9 +128,9 @@ export const BASIC_NODE_CONFIG = {
    * note: it will propably make sense to add a state-machine here
    */
   calculate(
-    inputs: BasicNodeInputs,
+    inputs: BasicNodeInputPorts,
     { globalValues }: { globalValues: GraphGlobals },
-  ): BasicNodeOutputs {
+  ): BasicNodeOutputPorts {
     const node = this as unknown as AbstractNode
     const { step } = globalValues as unknown as { step: number }
     const options: NodeOptionConfiguration[] = [...inputs.options]

@@ -1,3 +1,4 @@
+import type { Color } from 'excalibur'
 import type { NodeOutput } from '../..'
 
 export interface Display2dInputs {
@@ -11,4 +12,24 @@ export interface Display2dOutputs {
 export interface Display2dRendererState {
   step: number
   data: NodeOutput[]
+  scenes: Display2dRendererSceneConfig[]
+}
+
+export interface Display2dRendererSceneConfig {
+  id: string
+  type: string
+  name: string
+  label: string
+}
+
+export interface Display2dRendererActorConfig {
+  id: string
+  type: string
+  name: string
+  label: string
+  width: number
+  height: number
+  x: number
+  y: number
+  color: Color
 }

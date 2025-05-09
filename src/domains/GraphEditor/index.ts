@@ -2,7 +2,7 @@ export interface GraphGlobals {
   step: number
 }
 
-export interface BasicNodeInputs {
+export interface BasicNodeInputPorts {
   type: string
   parent: string | undefined
   description: string
@@ -26,7 +26,7 @@ export interface BasicNodeInputs {
   view: BasicNodeViewModel
 }
 
-export interface BasicNodeOutputs {
+export interface BasicNodeOutputPorts {
   children: string
   outputs: NodeOutput
 }

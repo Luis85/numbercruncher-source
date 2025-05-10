@@ -285,6 +285,10 @@ function onSelectChange(name: string) {
           <button class="baklava-toolbar-button" @click="router.push('/')">🏡</button>
 
           <!-- Misc Info -->
+          <p class="p-0 mb-0 me-2">Nodes: {{ editor.graph.nodes.length }}</p>
+          <p class="p-0 mb-0 me-2">Connections: {{ editor.graph.connections.length }}</p>
+
+          <!-- Scaling and position -->
           <p class="p-0 mb-0 me-2">Scale: {{ editor.graph.scaling.toFixed(2) }}</p>
           <button class="baklava-toolbar-button" @click="editor.graph.scaling = 1">Set to 1</button>
           <p class="p-0 mb-0 me-2">x: {{ editor.graph.panning.x.toFixed(2) }}</p>

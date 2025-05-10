@@ -8,10 +8,10 @@ import type { Display2dNode } from '@/domains/GraphEditor/nodes/Display/Display2
 import { Actor, Color, Engine, PointerScope, Scene, vec, Vector, type ActorArgs } from 'excalibur'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { NodeInterface, useGraph } from 'baklavajs'
-import type { BasicNodeOutputPorts, NodeOutput } from '@/domains/GraphEditor'
+import type { BasicNodeOutputPorts, NodeInput, NodeOutput } from '@/domains/GraphEditor'
 import { PlaygroundScene } from '@/domains/ExcaliburJs/scenes/PlaygroundScene'
 import { TargetSearchComponent } from '@/domains/ExcaliburJs/components/TargetSearchComponent'
-import { TargetSearchSystem } from '@/domains/ExcaliburJs/systems/TargetSearchSystem'
+import { SystemRegistry } from '@/domains/GraphEditor/registry/SystemRegistry'
 const props = defineProps<{
   modelValue: Display2dRendererState
   node: Display2dNode
@@ -77,17 +77,17 @@ function logState() {
 }
 
 async function reloadScenes() {
-  if(!engine.value) return
+  if (!engine.value) return
   await buildScenes([])
   await repaintScreen()
 }
 
 async function repaintScreen() {
-  if(!engine.value) return
+  if (!engine.value) return
   const isRunning = engine.value.isRunning()
   await engine.value.start()
   engine.value.stop()
-  if(isRunning) engine.value.start()
+  if (isRunning) engine.value.start()
 }
 
 async function buildScenes(newScenes: Display2dRendererSceneConfig[]) {
@@ -123,71 +123,35 @@ function loadScenes() {
     const sceneCalculated = sceneStateOutputs.outputs as unknown as NodeInterface
     const sceneConfig = sceneCalculated.value as unknown as NodeOutput
 
-    const systems: string[] = []
-    const actors: Display2dRendererActorConfig[] = []
-
-    // build system config
+    // get system config
     const systemReferences = sceneConfig.values.filter(
       (item) => item.type === 'Export' && item.name === 'SystemNode',
     )
-    for (const system of systemReferences) {
-      systems.push(system.label)
-    }
 
-    // build actor config
+    // get actor config
     const actorReferences = sceneConfig.values.filter(
       (item) => item.type === 'Export' && item.name === 'ActorNode',
     )
-    for (const actorReference of actorReferences) {
-      const actorNodeId = String(actorReference.value)
-      const actorNode = graph.value.findNodeById(actorNodeId)
 
-      if (!actorNode) continue
-
-      const actorNodeOutputs = actorNode.outputs as unknown as BasicNodeOutputPorts
-      const actorNodeCalculated = actorNodeOutputs.outputs as unknown as NodeInterface
-      const actorNodeConfig = actorNodeCalculated.value as unknown as NodeOutput
-      const actorComponents = actorNodeConfig.values.filter((item) => item.type === 'Component')
-      const actorTags = actorNodeConfig.values.find((item) => item.type === 'NodeTags')
-      const tags = actorTags && actorTags.value ? String(actorTags.value).split(', ') : []
-
-      const color =
-        actorNodeConfig.color.length >= 6
-          ? Color.fromHex(actorNodeConfig.color)
-          : Color.ExcaliburBlue
-
-      const actorConfig: Display2dRendererActorConfig = {
-        id: actorNodeConfig.id,
-        name: actorNodeConfig.name,
-        type: actorNodeConfig.type,
-        label: actorNodeConfig.name,
-        width: actorNodeConfig.width,
-        height: actorNodeConfig.height,
-        z: actorNodeConfig.z,
-        color: color,
-        pos: new Vector(actorNodeConfig.x, actorNodeConfig.y),
-        components: actorComponents.map((item) => item.name),
-        tags: tags,
-      }
-      actors.push(actorConfig)
-    }
-
+    // build scene config
     const newScene = {
       id: sceneConfig.id,
       name: sceneConfig.name,
-      actors: actors,
+      actors: buildActorConfig(actorReferences),
     }
 
-    // Szene neu anlegen, falls unbekannt und systeme hinzufügen
+    // create new scene if non existant, and add systems
     if (!sceneMap.has(newScene.id)) {
       const scene = new Scene()
       sceneMap.set(newScene.id, scene)
       engine.value?.addScene(newScene.id, scene)
+
       // add systems
+      const systems = systemReferences.map((item) => item.label)
       for (const systemConfig of systems) {
-        if(systemConfig === 'TargetSearchSystem') {
-          scene.world.add(TargetSearchSystem)
-        }
+        const SystemClass = SystemRegistry[systemConfig]
+        if (!SystemClass) continue
+        scene.world.add(SystemClass)
       }
     }
     const scene = sceneMap.get(newScene.id)!
@@ -216,9 +180,10 @@ function loadScenes() {
         }
 
         // add components
+        // @todo: add component registry and make them configurable from node input
         for (const component of actorConfig.components) {
           actor.addTag(component)
-          if(component === 'TargetSearchComponent') {
+          if (component === 'TargetSearchComponent') {
             actor.addComponent(new TargetSearchComponent(vec(600, 400)))
           }
         }
@@ -238,6 +203,42 @@ function loadScenes() {
       }
     }
   }
+}
+
+function buildActorConfig(actorReferences: NodeInput[]): Display2dRendererActorConfig[] {
+  const actors: Display2dRendererActorConfig[] = []
+  for (const actorReference of actorReferences) {
+    const actorNodeId = String(actorReference.value)
+    const actorNode = graph.value.findNodeById(actorNodeId)
+
+    if (!actorNode) continue
+
+    const actorNodeOutputs = actorNode.outputs as unknown as BasicNodeOutputPorts
+    const actorNodeCalculated = actorNodeOutputs.outputs as unknown as NodeInterface
+    const actorNodeConfig = actorNodeCalculated.value as unknown as NodeOutput
+    const actorComponents = actorNodeConfig.values.filter((item) => item.type === 'Component')
+    const actorTags = actorNodeConfig.values.find((item) => item.type === 'NodeTags')
+    const tags = actorTags && actorTags.value ? String(actorTags.value).split(', ') : []
+
+    const color =
+      actorNodeConfig.color.length >= 6 ? Color.fromHex(actorNodeConfig.color) : Color.ExcaliburBlue
+
+    const actorConfig: Display2dRendererActorConfig = {
+      id: actorNodeConfig.id,
+      name: actorNodeConfig.name,
+      type: actorNodeConfig.type,
+      label: actorNodeConfig.name,
+      width: actorNodeConfig.width,
+      height: actorNodeConfig.height,
+      z: actorNodeConfig.z,
+      color: color,
+      pos: new Vector(actorNodeConfig.x, actorNodeConfig.y),
+      components: actorComponents.map((item) => item.name),
+      tags: tags,
+    }
+    actors.push(actorConfig)
+  }
+  return actors
 }
 
 watch(

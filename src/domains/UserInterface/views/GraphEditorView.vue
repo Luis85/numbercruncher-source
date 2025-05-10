@@ -243,7 +243,12 @@ function onSelectChange(name: string) {
       <EditorToolbar>
         <template #custom>
           <!-- Settings -->
-          <button class="baklava-toolbar-button" @click="settings.palette.enabled = !settings.palette.enabled">Panel {{ settings.palette.enabled }}</button>
+          <button
+            class="baklava-toolbar-button"
+            @click="settings.palette.enabled = !settings.palette.enabled"
+          >
+            Panel {{ settings.palette.enabled }}
+          </button>
 
           <!-- Save / Reset / Simulation -->
           <button class="baklava-toolbar-button" @click="handleSave">💾</button>

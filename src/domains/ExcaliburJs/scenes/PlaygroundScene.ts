@@ -1,8 +1,7 @@
-import { Actor, Color, Scene, type ActorArgs } from "excalibur";
+import { Actor, Color, Scene, type ActorArgs } from 'excalibur'
 
 export class PlaygroundScene extends Scene {
   public onInitialize() {
-
     const playerActor: ActorArgs = {
       name: 'Player Actor',
       width: 25,

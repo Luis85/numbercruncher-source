@@ -5,11 +5,13 @@ import type {
   Display2dRendererState,
 } from '@/domains/GraphEditor/nodes/Display'
 import type { Display2dNode } from '@/domains/GraphEditor/nodes/Display/Display2dNode'
-import { Actor, Color, Engine, PointerScope, Scene, Vector, type ActorArgs } from 'excalibur'
+import { Actor, Color, Engine, PointerScope, Scene, vec, Vector, type ActorArgs } from 'excalibur'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { NodeInterface, useGraph } from 'baklavajs'
 import type { BasicNodeOutputPorts, NodeOutput } from '@/domains/GraphEditor'
 import { PlaygroundScene } from '@/domains/ExcaliburJs/scenes/PlaygroundScene'
+import { TargetSearchComponent } from '@/domains/ExcaliburJs/components/TargetSearchComponent'
+import { TargetSearchSystem } from '@/domains/ExcaliburJs/systems/TargetSearchSystem'
 const props = defineProps<{
   modelValue: Display2dRendererState
   node: Display2dNode
@@ -54,7 +56,6 @@ function buildEngine() {
   }
 }
 
-
 function startEngine() {
   if (!engine.value) return
   engine.value.start().then(function () {
@@ -65,6 +66,7 @@ function startEngine() {
 async function changeScene(name: string) {
   if (!engine.value) return
   await engine.value.goToScene(name)
+  await repaintScreen()
   console.log('switched to scene: ' + name)
 }
 
@@ -72,6 +74,20 @@ function logState() {
   console.log('graph', graph.value)
   console.log('scenes', scenes.value)
   console.log('engine', engine.value)
+}
+
+async function reloadScenes() {
+  if(!engine.value) return
+  await buildScenes([])
+  await repaintScreen()
+}
+
+async function repaintScreen() {
+  if(!engine.value) return
+  const isRunning = engine.value.isRunning()
+  await engine.value.start()
+  engine.value.stop()
+  if(isRunning) engine.value.start()
 }
 
 async function buildScenes(newScenes: Display2dRendererSceneConfig[]) {
@@ -95,10 +111,6 @@ async function buildScenes(newScenes: Display2dRendererSceneConfig[]) {
   loadScenes()
 }
 
-async function reloadScenes() {
-  await buildScenes([])
-}
-
 function loadScenes() {
   for (const sceneReference of scenes.value) {
     // get Scene Config from graph
@@ -114,15 +126,15 @@ function loadScenes() {
     const systems: string[] = []
     const actors: Display2dRendererActorConfig[] = []
 
-    // add the systems to the scene
+    // build system config
     const systemReferences = sceneConfig.values.filter(
       (item) => item.type === 'Export' && item.name === 'SystemNode',
     )
     for (const system of systemReferences) {
-      systems.push(String(system.value))
+      systems.push(system.label)
     }
 
-    // add the actors to the scene
+    // build actor config
     const actorReferences = sceneConfig.values.filter(
       (item) => item.type === 'Export' && item.name === 'ActorNode',
     )
@@ -171,10 +183,16 @@ function loadScenes() {
       const scene = new Scene()
       sceneMap.set(newScene.id, scene)
       engine.value?.addScene(newScene.id, scene)
+      // add systems
+      for (const systemConfig of systems) {
+        if(systemConfig === 'TargetSearchSystem') {
+          scene.world.add(TargetSearchSystem)
+        }
+      }
     }
-
-    // Actors
     const scene = sceneMap.get(newScene.id)!
+
+    // add actors
     // entfernte Actors löschen
     const keepIds = newScene.actors.map((a) => a.id!)
     for (const [id, actor] of actorMap) {
@@ -200,6 +218,9 @@ function loadScenes() {
         // add components
         for (const component of actorConfig.components) {
           actor.addTag(component)
+          if(component === 'TargetSearchComponent') {
+            actor.addComponent(new TargetSearchComponent(vec(600, 400)))
+          }
         }
 
         actorMap.set(actorConfig.id, actor)
@@ -250,7 +271,7 @@ onBeforeUnmount(() => {
         <p>
           <button v-if="!engine.isRunning()" @click="startEngine">▶️Start</button>
           <button v-if="engine.isRunning()" @click="engine.stop">🛑Stop</button>
-          <button @click="reloadScenes">Reload Scenes</button>
+          <button @click="reloadScenes">Reload</button>
           <button @click="engine.toggleDebug()">Debug ({{ engine.isDebug }})</button>
           <button @click="logState()">Log State</button>
         </p>
@@ -325,14 +346,14 @@ onBeforeUnmount(() => {
 #excalibur-canvas {
   width: 100%;
   height: 600px;
-  border: 1px solid #00000099;
+  border: 10px solid #00000099;
   box-shadow: 0 0 5px 0px rgba(0, 0, 0, 0.2);
   display: block;
   transition: all ease 0.2s;
 }
 
 #excalibur-canvas.engine-is-running {
-  border: 1px solid #000000e0;
+  border-color: #000000c4;
   box-shadow: 0 0 8px 2px rgba(16, 145, 201, 0.702);
 }
 </style>

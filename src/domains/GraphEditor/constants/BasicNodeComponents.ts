@@ -1,4 +1,5 @@
 export const BASIC_NODE_COMPONENTS = [
+  'TargetSearch',
   'Trigger',
   'Timer',
   'StateMachine',

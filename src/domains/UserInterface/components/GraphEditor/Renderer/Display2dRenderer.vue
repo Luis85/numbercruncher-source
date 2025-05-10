@@ -9,6 +9,7 @@ import { Actor, Color, Engine, PointerScope, Scene, Vector, type ActorArgs } fro
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { NodeInterface, useGraph } from 'baklavajs'
 import type { BasicNodeOutputPorts, NodeOutput } from '@/domains/GraphEditor'
+import { PlaygroundScene } from '@/domains/ExcaliburJs/scenes/PlaygroundScene'
 const props = defineProps<{
   modelValue: Display2dRendererState
   node: Display2dNode
@@ -43,7 +44,8 @@ function buildEngine() {
       pointerScope: PointerScope.Canvas,
     })
 
-    addIterationTargetScene('iteration target')
+    const playground = new PlaygroundScene()
+    engine.value.add('Playground', playground)
 
     engine.value.debug.entity.showName = true
     engine.value.debug.entity.showAll = true
@@ -52,50 +54,6 @@ function buildEngine() {
   }
 }
 
-function addIterationTargetScene(name: string) {
-  if (!engine.value) return
-  const scene = new Scene()
-  const playerActor: ActorArgs = {
-    name: 'Player Actor',
-    width: 25,
-    height: 25,
-    color: Color.ExcaliburBlue,
-  }
-
-  const enemyActor: ActorArgs = {
-    name: 'Enemy Actor',
-    width: 25,
-    height: 25,
-    color: Color.Red,
-  }
-
-  const player = new Actor(playerActor)
-  const enemy = new Actor(enemyActor)
-
-  scene.add(player)
-  scene.add(enemy)
-
-  player.actions.repeatForever((ctx) => {
-    ctx
-      .moveTo(500, 150, 1200)
-      .delay(1000)
-      .moveTo(100, 300, 1500)
-      .delay(1000)
-      .moveTo(200, 500, 1500)
-      .delay(800)
-  })
-
-  enemy.actions.repeatForever((ctx) => {
-    ctx
-      .moveTo(100, 350, 600)
-      .delay(1000)
-      .moveTo(200, 100, 200)
-      .delay(1000)
-      .moveTo(340, 500, 1100)
-      .delay(800)
-  })
-  engine.value.addScene(name, scene)
-}
 
 function startEngine() {
   if (!engine.value) return
@@ -332,7 +290,11 @@ onBeforeUnmount(() => {
       </section>
     </section>
 
-    <canvas ref="canvas" id="excalibur-canvas" :class="(engine && engine.isRunning()) ? 'engine-is-running' : ''"></canvas>
+    <canvas
+      ref="canvas"
+      id="excalibur-canvas"
+      :class="engine && engine.isRunning() ? 'engine-is-running' : ''"
+    ></canvas>
   </div>
 </template>
 

@@ -12,6 +12,7 @@ export const BASIC_NODE_TYPES = [
   'TestStepNode',
   'EventNode',
   'ViewNode',
+  'FormNode',
   'FunctionNode',
   'SinkNode',
   'DrainNode',
@@ -25,4 +26,5 @@ export const BASIC_NODE_TYPES = [
   'ActivityNode',
   'PlayerNode',
   'UserNode',
+  'UserInterfaceNode',
 ]

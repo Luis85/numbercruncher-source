@@ -47,7 +47,7 @@ settings.nodes.defaultWidth = 300
 settings.nodes.maxWidth = 1800
 settings.nodes.minWidth = 300
 
-settings.palette.enabled = true
+settings.palette.enabled = false
 
 // build additional context menu
 settings.contextMenu.additionalItems = [
@@ -59,7 +59,6 @@ settings.contextMenu.additionalItems = [
   { label: 'Paste', command: Commands.PASTE_COMMAND },
   { label: 'Delete Selected', command: Commands.DELETE_NODES_COMMAND },
 ]
-
 // node registry
 editor.registerNodeType(BasicNode, { category: 'Basics' })
 editor.registerNodeType(NoteNode, { category: 'Basics' })
@@ -243,6 +242,9 @@ function onSelectChange(name: string) {
     <template #toolbar>
       <EditorToolbar>
         <template #custom>
+          <!-- Settings -->
+          <button class="baklava-toolbar-button" @click="settings.palette.enabled = !settings.palette.enabled">Panel {{ settings.palette.enabled }}</button>
+
           <!-- Save / Reset / Simulation -->
           <button class="baklava-toolbar-button" @click="handleSave">💾</button>
           <button class="baklava-toolbar-button" v-if="!running" @click="handleStart">▶️</button>

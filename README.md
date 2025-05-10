@@ -14,6 +14,8 @@ authorUrl: https://luis-mendez.de
 An Obsidian Plugin, supporting the product development & management process e2e. 
 Establishing a unified content repository for product teams.
 
+Automate the boring stuff as a byproduct.
+
 ---
 
 ## Early alpha

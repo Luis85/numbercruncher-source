@@ -346,14 +346,16 @@ onBeforeUnmount(() => {
 #excalibur-canvas {
   width: 100%;
   height: 600px;
-  border: 10px solid #00000099;
+  border: 10px solid #00000082;
   box-shadow: 0 0 5px 0px rgba(0, 0, 0, 0.2);
   display: block;
   transition: all ease 0.2s;
+  background-color: #000000af;
 }
 
 #excalibur-canvas.engine-is-running {
-  border-color: #000000c4;
+  border-color: #00000099;
   box-shadow: 0 0 8px 2px rgba(16, 145, 201, 0.702);
+  background-color: transparent;
 }
 </style>

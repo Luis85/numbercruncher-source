@@ -1,7 +1,7 @@
 {
   "id": "numbercruncher",
   "name": "The Numbercruncher",
-  "version": "0.0.1",
+  "version": "0.0.1-rc-1",
   "minAppVersion": "1.18.0",
   "description": "Ideate, Design, Validate, Develop and Document in one place.",
   "author": "Luis Mendez",

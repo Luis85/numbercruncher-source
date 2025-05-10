@@ -1,6 +1,6 @@
 {
   "name": "numbercruncher",
-  "version": "0.0.1",
+  "version": "0.0.1-rc-1",
   "author": "Luis Mendez",
   "private": true,
   "type": "module",

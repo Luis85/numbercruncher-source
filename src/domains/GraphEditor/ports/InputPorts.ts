@@ -93,27 +93,13 @@ export const BASIC_NODE_INPUTS = {
       .setComponent(markRaw(SidebarComponents))
       .setPort(false),
 
-  // Event System
-  emits: () =>
-    new NodeInterface<string[]>('Emits', [])
-      .setHidden(true)
-      .use(displayInSidebar, true)
-      .setComponent(markRaw(SidebarEmitEvents))
-      .setPort(false),
-  subscribes: () =>
-    new NodeInterface<string[]>('Subscribes', [])
-      .setHidden(true)
-      .use(displayInSidebar, true)
-      .setComponent(markRaw(SidebarSubscribeEvents))
-      .setPort(false),
-
   /**
    * ECS System
    *
    * @todo: needs rework to be object[] based instead of string[], the interfaces also needs overhaul as they currently get the whole viewmodel which is not needed here.
    */
   tags: () =>
-    new NodeInterface<string[]>('Tags', [])
+    new NodeInterface<string[]>('Tags and Groups', [])
       .setHidden(true)
       .use(displayInSidebar, true)
       .setComponent(markRaw(SidebarTags))
@@ -129,5 +115,19 @@ export const BASIC_NODE_INPUTS = {
       .setHidden(true)
       .use(displayInSidebar, true)
       .setComponent(markRaw(SidebarResources))
+      .setPort(false),
+
+  // Event System
+  emits: () =>
+    new NodeInterface<string[]>('Emits', [])
+      .setHidden(true)
+      .use(displayInSidebar, true)
+      .setComponent(markRaw(SidebarEmitEvents))
+      .setPort(false),
+  subscribes: () =>
+    new NodeInterface<string[]>('Subscribes', [])
+      .setHidden(true)
+      .use(displayInSidebar, true)
+      .setComponent(markRaw(SidebarSubscribeEvents))
       .setPort(false),
 }

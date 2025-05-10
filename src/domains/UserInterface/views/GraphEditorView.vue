@@ -281,6 +281,12 @@ function onSelectChange(name: string) {
 
           <!-- Nav -->
           <button class="baklava-toolbar-button" @click="router.push('/')">🏡</button>
+
+          <!-- Misc Info -->
+          <p class="p-0 mb-0 me-2">Scale: {{ editor.graph.scaling.toFixed(2) }}</p>
+          <button class="baklava-toolbar-button" @click="editor.graph.scaling = 1">Set to 1</button>
+          <p class="p-0 mb-0 me-2">x: {{ editor.graph.panning.x.toFixed(2) }}</p>
+          <p class="p-0 mb-0 me-2">y: {{ editor.graph.panning.y.toFixed(2) }}</p>
         </template>
       </EditorToolbar>
     </template>
@@ -330,7 +336,9 @@ function onSelectChange(name: string) {
   column-gap: 25px;
 }
 
-.baklava-node.ActorNode {
+.baklava-node.ActorNode,
+.baklava-node.PlayerNode,
+.baklava-node.UserNode {
   background-color: rgba(52, 140, 217, 0.6);
 }
 

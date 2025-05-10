@@ -18,7 +18,7 @@ import { BASIC_NODE_OUTPUTS } from '../../ports/OutputPorts'
 
 export const BASIC_NODE_CONFIG = {
   type: 'BasicNode',
-  title: '🧱New Basic Node',
+  title: '🧱New Node',
 
   inputs: BASIC_NODE_INPUTS,
   outputs: BASIC_NODE_OUTPUTS,
@@ -39,6 +39,10 @@ export const BASIC_NODE_CONFIG = {
     const node = this as unknown as AbstractNode
     const dynamicInputs: NodeOptionConfiguration[] = [...inputs.options]
     const dynamic: Record<string, () => TextInputInterface | NumberInterface | SelectInterface> = {}
+
+    if (node.title === '🧱New Node' && inputs.type !== 'BasicNode') {
+      node.title = 'New ' + inputs.type
+    }
 
     // add selected components to the inputs
     for (const component of inputs.components) {
@@ -170,6 +174,14 @@ export const BASIC_NODE_CONFIG = {
       values: [],
     }
 
+    // add the selected tags
+    nodeOutput.values.push({
+      type: 'NodeTags',
+      name: 'Tags',
+      label: 'Tags',
+      value: inputs.tags.join(', '),
+    })
+
     // add the selected components to the output
     for (const component of inputs.components) {
       const option = node.inputs[toPascalCase(component)]
@@ -188,11 +200,15 @@ export const BASIC_NODE_CONFIG = {
     for (const exportedInput of inputs.exports) {
       const input = inputs.inputs.find((item) => item.id === exportedInput.value)
       if (!input) continue
+
+      const type = input.type === 'ComponentNode' ? 'Component' : 'Export'
+      const name = type === 'Component' ? input.name : input.type
+      const value = type === 'Component' ? '' : input.id
       nodeOutput.values.push({
-        type: 'Export',
-        name: input.type,
+        type,
+        name,
         label: input.name,
-        value: input.id,
+        value,
       })
     }
 

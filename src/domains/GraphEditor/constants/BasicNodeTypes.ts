@@ -23,4 +23,6 @@ export const BASIC_NODE_TYPES = [
   'StateMachineNode',
   'JobToBeDoneNode',
   'ActivityNode',
+  'PlayerNode',
+  'UserNode',
 ]

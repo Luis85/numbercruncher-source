@@ -27,7 +27,6 @@ const complexity = computed(() => {
 </script>
 
 <template>
-  <hr />
   <section class="head mb-3">
     <p class="mb-2"><strong>Type:</strong> {{ modelValue.type }}</p>
     <p class="mb-2"><strong>View:</strong> {{ modelValue.view }}</p>
@@ -47,7 +46,6 @@ const complexity = computed(() => {
     {{ modelValue.description }}
   </section>
 
-  <hr />
   <section>
     <button @click="emit('openSidebar')">Edit</button>
     <button @click="debug = !debug">Debug {{ debug }}</button>

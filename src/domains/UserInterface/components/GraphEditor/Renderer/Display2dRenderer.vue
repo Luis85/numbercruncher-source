@@ -178,7 +178,7 @@ function loadScenes() {
       actors: actors,
     }
 
-    // Szene neu anlegen, falls unbekannt
+    // Szene neu anlegen, falls unbekannt und systeme hinzufügen
     if (!sceneMap.has(newScene.id)) {
       const scene = new Scene()
       sceneMap.set(newScene.id, scene)

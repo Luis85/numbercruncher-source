@@ -14,7 +14,7 @@ export class ActorWanderBehaviourComponent extends Component {
   /** Zu wartende Dauer (Sekunden) */
   public waitDuration: number
 
-  constructor(radius: number = 200, speed: number = 60, waitRange: [number, number] = [0.5, 2]) {
+  constructor(radius: number = 200, speed: number = 160, waitRange: [number, number] = [0.5, 2]) {
     super()
     this.radius = radius
     this.speed = speed

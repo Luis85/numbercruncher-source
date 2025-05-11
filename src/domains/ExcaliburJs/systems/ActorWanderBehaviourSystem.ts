@@ -17,6 +17,7 @@ export class ActorWanderBehaviourSystem extends System {
     typeof TransformComponent | typeof MotionComponent | typeof ActorWanderBehaviourComponent
   >
 
+  // @todo: move this into the scene, as the name already suggests, this is environment not system scope
   private worldWidth: number = 400
   private worldHeight: number = 400
 

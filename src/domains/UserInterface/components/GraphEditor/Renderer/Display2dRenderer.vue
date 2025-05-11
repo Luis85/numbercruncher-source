@@ -12,6 +12,7 @@ import type { BasicNodeOutputPorts, NodeInput, NodeOutput } from '@/domains/Grap
 import { PlaygroundScene } from '@/domains/ExcaliburJs/scenes/PlaygroundScene'
 import { TargetSearchComponent } from '@/domains/ExcaliburJs/components/TargetSearchComponent'
 import { SystemRegistry } from '@/domains/GraphEditor/registry/SystemRegistry'
+import { ActorWanderBehaviourComponent } from '@/domains/ExcaliburJs/components/ActorWanderBehaviourComponent'
 const props = defineProps<{
   modelValue: Display2dRendererState
   node: Display2dNode
@@ -186,6 +187,9 @@ function loadScenes() {
           if (component === 'TargetSearchComponent') {
             actor.addComponent(new TargetSearchComponent(vec(600, 400)))
           }
+          if (component === 'ActorWanderBehaviourComponent') {
+            actor.addComponent(new ActorWanderBehaviourComponent())
+          }
         }
 
         actorMap.set(actorConfig.id, actor)
@@ -259,6 +263,7 @@ onBeforeUnmount(() => {
   engine.value.stop()
   engine.value.dispose()
 })
+
 </script>
 
 <template>
@@ -295,9 +300,12 @@ onBeforeUnmount(() => {
         <div v-for="actor in engine.currentScene.actors" :key="actor.id">
           <p>id: {{ actor.id }}<br />name: {{ actor.name }}</p>
         </div>
-
-        <p><strong>Stats Current Frame</strong></p>
-        <pre>{{ engine.isRunning() ? engine.stats.currFrame : 0 }}</pre>
+        <div v-if="engine.isRunning()">
+          <pre>{{ engine.stats.currFrame.actors }}</pre>
+          <p>Elapsed Time: {{ engine.stats.currFrame.elapsedMs.toFixed(2) }}</p>
+          <p>FPS: {{ engine.stats.currFrame.fps.toFixed(2) }}</p>
+          <p>Collisions: {{ engine.stats.currFrame.physics.collisions }}</p>
+        </div>
 
         <p><strong>Provided Scenes</strong></p>
         <div v-for="item in modelValue.scenes" :key="item.id">

@@ -11,8 +11,8 @@ import { NodeInterface, useGraph } from 'baklavajs'
 import type { BasicNodeOutputPorts, NodeInput, NodeOutput } from '@/domains/GraphEditor'
 import { PlaygroundScene } from '@/domains/ExcaliburJs/scenes/PlaygroundScene'
 import { TargetSearchComponent } from '@/domains/ExcaliburJs/components/TargetSearchComponent'
-import { SystemRegistry } from '@/domains/GraphEditor/registry/SystemRegistry'
 import { ActorWanderBehaviourComponent } from '@/domains/ExcaliburJs/components/ActorWanderBehaviourComponent'
+import { BasicScene } from '@/domains/ExcaliburJs/scenes/BasicScene'
 const props = defineProps<{
   modelValue: Display2dRendererState
   node: Display2dNode
@@ -140,20 +140,13 @@ function loadScenes() {
       name: sceneConfig.name,
       actors: buildActorConfig(actorReferences),
     }
+    const systems = systemReferences.map((item) => item.label)
 
     // create new scene if non existant, and add systems
     if (!sceneMap.has(newScene.id)) {
-      const scene = new Scene()
+      const scene = new BasicScene(newScene.id, newScene.name, systems)
       sceneMap.set(newScene.id, scene)
       engine.value?.addScene(newScene.id, scene)
-
-      // add systems
-      const systems = systemReferences.map((item) => item.label)
-      for (const systemConfig of systems) {
-        const SystemClass = SystemRegistry[systemConfig]
-        if (!SystemClass) continue
-        scene.world.add(SystemClass)
-      }
     }
     const scene = sceneMap.get(newScene.id)!
 
@@ -170,8 +163,6 @@ function loadScenes() {
     for (const actorConfig of newScene.actors) {
       if (!actorMap.has(actorConfig.id)) {
         const actorArgs: ActorArgs = { ...actorConfig }
-        actorArgs.z = 0
-
         // @todo: extend base actor for event registry
         const actor = new Actor(actorArgs)
 
@@ -263,7 +254,6 @@ onBeforeUnmount(() => {
   engine.value.stop()
   engine.value.dispose()
 })
-
 </script>
 
 <template>
@@ -286,7 +276,8 @@ onBeforeUnmount(() => {
         <ul>
           <li v-for="(scene, key) in engine.scenes" :key="key">
             <button @click="changeScene(String(key))">
-              <span v-if="engine.currentSceneName === key">✅</span>{{ key }}
+              <span v-if="engine.currentSceneName === key">✅</span
+              >{{ (scene as unknown as BasicScene).name ?? key }}
             </button>
           </li>
         </ul>
@@ -294,7 +285,8 @@ onBeforeUnmount(() => {
 
       <section id="excalibur-debug" v-if="engine.isDebug">
         <p><strong>Current Scene</strong></p>
-        <p>name: {{ engine.currentSceneName }}</p>
+        <p class="mb-0">id: {{ (engine.currentScene as unknown as BasicScene).id }}</p>
+        <p>name: {{ (engine.currentScene as unknown as BasicScene).name }}</p>
 
         <p><strong>Scene Actors</strong></p>
         <div v-for="actor in engine.currentScene.actors" :key="actor.id">
@@ -302,19 +294,19 @@ onBeforeUnmount(() => {
         </div>
         <div v-if="engine.isRunning()">
           <pre>{{ engine.stats.currFrame.actors }}</pre>
-          <p>Elapsed Time: {{ engine.stats.currFrame.elapsedMs.toFixed(2) }}</p>
-          <p>FPS: {{ engine.stats.currFrame.fps.toFixed(2) }}</p>
+          <p class="mb-0">Elapsed Time: {{ engine.stats.currFrame.elapsedMs.toFixed(2) }}</p>
+          <p class="mb-0">FPS: {{ engine.stats.currFrame.fps.toFixed(2) }}</p>
           <p>Collisions: {{ engine.stats.currFrame.physics.collisions }}</p>
         </div>
 
-        <p><strong>Provided Scenes</strong></p>
+        <p class="mb-0"><strong>Provided Scenes</strong></p>
         <div v-for="item in modelValue.scenes" :key="item.id">
           <pre>{{ item }}</pre>
         </div>
 
         <p><strong>Provided Data</strong></p>
         <div v-for="item in modelValue.data" :key="item.id">
-          <p>{{ item.type }}: {{ item.name }}</p>
+          <p class="mb-0">{{ item.type }}: {{ item.name }}</p>
           <pre>{{ item.values }}</pre>
         </div>
       </section>

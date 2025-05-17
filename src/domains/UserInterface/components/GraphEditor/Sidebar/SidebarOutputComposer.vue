@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import type { BasicNode as BasicNodeNodeConstructor } from '@/domains/GraphEditor/nodes/Basics/BasicNode'
+import type { BasicNode as BasicNodeNodeConstructor } from '@/domains/GraphEditor/nodes/Basics/BasicDynamicNode'
 import type { NodeInterface } from 'baklavajs'
 import type { SidebarOption } from '@/domains/GraphEditor'
 type BasicNode = InstanceType<typeof BasicNodeNodeConstructor>

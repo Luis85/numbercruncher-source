@@ -1,10 +1,10 @@
 import { defineDynamicNode } from 'baklavajs'
 import { NumberInterface, TextInputInterface } from 'baklavajs'
-import { BASIC_NODE_CONFIG } from '../Basics/BasicNode'
+import { BASIC_DYNAMIC_NODE_CONFIG } from '../Basics/BasicDynamicNode'
 
 export const DynamicNodeTemplate = defineDynamicNode({
   // 1: komplett alles von basicNodeConfig übernehmen
-  ...BASIC_NODE_CONFIG,
+  ...BASIC_DYNAMIC_NODE_CONFIG,
 
   // 2: aber type/title überschreiben
   type: 'DynamicNodeTemplate',
@@ -12,23 +12,23 @@ export const DynamicNodeTemplate = defineDynamicNode({
 
   // 3: neue Ports mergen
   inputs: {
-    ...BASIC_NODE_CONFIG.inputs,
+    ...BASIC_DYNAMIC_NODE_CONFIG.inputs,
     extraValue: () => new NumberInterface('Extra Value', 42),
   },
   outputs: {
-    ...BASIC_NODE_CONFIG.outputs,
+    ...BASIC_DYNAMIC_NODE_CONFIG.outputs,
     extraResult: () => new TextInputInterface('Extra Result', '').setPort(false),
   },
 
   // 4: onCreate-Handler erweitern
   onCreate() {
-    BASIC_NODE_CONFIG.onCreate!.call(this)
+    BASIC_DYNAMIC_NODE_CONFIG.onCreate!.call(this)
     // eigene Logik …
   },
 
   // 5: onUpdate-Handler erweitern
   onUpdate(inputs) {
-    const base = BASIC_NODE_CONFIG.onUpdate!.call(this, inputs)
+    const base = BASIC_DYNAMIC_NODE_CONFIG.onUpdate!.call(this, inputs)
     return {
       inputs: {
         ...base.inputs,
@@ -40,7 +40,7 @@ export const DynamicNodeTemplate = defineDynamicNode({
 
   // 6: calculate erweitern
   calculate(inputs, ctx) {
-    const baseOut = BASIC_NODE_CONFIG.calculate!.call(this, inputs, ctx)
+    const baseOut = BASIC_DYNAMIC_NODE_CONFIG.calculate!.call(this, inputs, ctx)
     baseOut.outputs.values = [
       ...baseOut.outputs.values,
       {

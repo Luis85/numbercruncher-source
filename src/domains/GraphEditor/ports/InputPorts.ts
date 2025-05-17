@@ -10,7 +10,7 @@ import {
 import { markRaw } from 'vue'
 import type { NodeOutput, BasicNodeViewModel, NodeOptionConfiguration, SidebarOption } from '..'
 
-import BasicNodeRenderer from '@/domains/UserInterface/components/GraphEditor/Node/BasicNode.vue'
+import BasicNodeRenderer from '@/domains/UserInterface/components/GraphEditor/Node/BasicDynamicNode.vue'
 import SidebarTags from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarTags.vue'
 import SidebarEmitEvents from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarEmitEvents.vue'
 import SidebarSubscribeEvents from '@/domains/UserInterface/components/GraphEditor/Sidebar/SidebarSubscribeEvents.vue'

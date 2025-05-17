@@ -16,7 +16,7 @@ import {
 import { BASIC_NODE_INPUTS } from '../../ports/InputPorts'
 import { BASIC_NODE_OUTPUTS } from '../../ports/OutputPorts'
 
-export const BASIC_NODE_CONFIG = {
+export const BASIC_DYNAMIC_NODE_CONFIG = {
   type: 'BasicNode',
   title: '🧱New Node',
 
@@ -264,4 +264,4 @@ export const BASIC_NODE_CONFIG = {
   },
 }
 
-export const BasicNode = defineDynamicNode(BASIC_NODE_CONFIG)
+export const BasicNode = defineDynamicNode(BASIC_DYNAMIC_NODE_CONFIG)

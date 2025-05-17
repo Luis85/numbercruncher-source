@@ -7,7 +7,7 @@ import { DependencyEngine, applyResult } from '@baklavajs/engine'
 import { AbstractNode, type IEditorState, type IGraphState } from 'baklavajs'
 import '@baklavajs/themes/dist/syrup-dark.css'
 
-import { BasicNode } from '@/domains/GraphEditor/nodes/Basics/BasicNode.ts'
+import { BasicNode } from '@/domains/GraphEditor/nodes/Basics/BasicDynamicNode.ts'
 import { NoteNode } from '@/domains/GraphEditor/nodes/Basics/NoteNode.ts'
 import { TaskNode } from '@/domains/GraphEditor/nodes/Basics/TaskNode.ts'
 import { Display2dNode } from '@/domains/GraphEditor/nodes/Display/Display2dNode.ts'

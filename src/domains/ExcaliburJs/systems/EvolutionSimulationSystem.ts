@@ -6,7 +6,7 @@ import { rngFloat } from '@/utils/rngFloat'
 export class EvolutionSimulationSystem extends System {
   public priority = 99
   public systemType = SystemType.Update
-  public query: Query< typeof CreatureComponent >
+  public query: Query<typeof CreatureComponent>
 
   private scene?: Scene
   private environment?: Actor
@@ -27,7 +27,7 @@ export class EvolutionSimulationSystem extends System {
       width: this.worldWidth,
       height: this.worldHeight,
       color: Color.Green,
-      anchor: vec(0,0),
+      anchor: vec(0, 0),
       x: 100,
       y: 100,
     })
@@ -36,14 +36,13 @@ export class EvolutionSimulationSystem extends System {
   }
 
   public update() {
-
     // 1) Spawning
     const birthChance = 0.8
     if (rngFloat(0, 1) <= birthChance) this.spawnCreature()
 
     // 2) Culling
     for (const entity of this.query.entities) {
-      if(entity.isKilled()) {
+      if (entity.isKilled()) {
         this.environment?.removeChild(entity)
         continue
       }
@@ -55,7 +54,7 @@ export class EvolutionSimulationSystem extends System {
   }
 
   private spawnCreature() {
-    if(!this.scene || !this.environment) return
+    if (!this.scene || !this.environment) return
     const creature = new Actor({
       //name: `Creature #${this.scene.actors.length}${rngFloat(0,1)}`,
       x: rngInt(0, this.worldWidth),

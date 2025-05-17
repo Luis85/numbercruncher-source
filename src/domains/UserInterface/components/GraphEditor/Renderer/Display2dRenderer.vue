@@ -284,7 +284,6 @@ onBeforeUnmount(() => {
       </section>
 
       <section id="excalibur-debug" v-if="engine.isDebug">
-
         <div v-if="engine.isRunning()">
           <p class="mb-0">Elapsed Time: {{ engine.stats.currFrame.elapsedMs.toFixed(2) }}</p>
           <p>FPS: {{ engine.stats.currFrame.fps.toFixed(2) }}</p>
@@ -295,7 +294,6 @@ onBeforeUnmount(() => {
           <p>Collisions: {{ engine.stats.currFrame.physics.collisions }}</p>
           <pre>{{ engine.stats.currFrame.actors }}</pre>
         </div>
-
 
         <p class="mb-0"><strong>Provided Scenes</strong></p>
         <div v-for="item in modelValue.scenes" :key="item.id">

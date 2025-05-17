@@ -60,9 +60,9 @@ settings.contextMenu.additionalItems = [
   { label: 'Delete Selected', command: Commands.DELETE_NODES_COMMAND },
 ]
 // node registry
-editor.registerNodeType(BasicNode, { category: 'Basics' })
-editor.registerNodeType(NoteNode, { category: 'Basics' })
-editor.registerNodeType(TaskNode, { category: 'Basics' })
+editor.registerNodeType(BasicNode)
+editor.registerNodeType(NoteNode)
+editor.registerNodeType(TaskNode)
 editor.registerNodeType(Display2dNode, { category: 'Display' })
 
 // add global values

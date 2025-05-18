@@ -16,7 +16,7 @@ const emit = defineEmits<{
   (e: 'openSidebar'): void
 }>()
 
-const debug = ref(false)
+const debug = ref(true)
 
 const complexity = computed(() => {
   const metric = props.node.outputs.outputs.value.values.find(

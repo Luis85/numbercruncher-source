@@ -39,7 +39,11 @@ export const BASIC_NODE_INPUTS = {
       .setComponent(markRaw(BasicNodeRenderer))
       .setPort(false),
 
-  // Sidebar Options
+  /**
+   * Sidebar Options
+   * @todo: should be reworked to use a store to build one single form out of it
+   *
+   */
   type: () =>
     new SelectInterface('Type', 'BasicNode', structuredClone(BASIC_NODE_TYPES))
       .setHidden(true)
@@ -67,7 +71,10 @@ export const BASIC_NODE_INPUTS = {
   schema: () =>
     new TextInputInterface('Schema', '').setHidden(true).use(displayInSidebar, true).setPort(false),
 
-  // Node Shape
+  /**
+   * Node Shape
+   *
+   */
   color: () =>
     new NodeInterface<string>('Color', '')
       .setHidden(true)

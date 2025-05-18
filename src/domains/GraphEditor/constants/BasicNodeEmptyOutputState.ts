@@ -14,4 +14,5 @@ export const BASIC_NODE_EMPTY_OUTPUT_STATE: NodeOutput = {
   z: 0,
   opacity: 0,
   visible: false,
+  options: [],
 }

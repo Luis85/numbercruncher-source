@@ -38,4 +38,5 @@ export const BASIC_NODE_TYPES = [
   'ProjectNode',
   'ProductNode',
   'EntityNode',
+  'ContainerNode',
 ]

@@ -45,6 +45,8 @@ export default defineComponent({
 
 <template>
   <div class="baklava-toolbar" @contextmenu.stop.prevent="">
+    <slot name="start"></slot>
+
     <toolbar-button
       v-for="c in commands"
       :key="c.command"
@@ -63,6 +65,6 @@ export default defineComponent({
       />
     </template>
 
-    <slot name="custom"></slot>
+    <slot name="end"></slot>
   </div>
 </template>

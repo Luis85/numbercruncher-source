@@ -89,6 +89,29 @@ watch(selectedGraph, (newSel) => {
   renameGraphName.value = newSel
 })
 
+// Node Selection and Sidebar behaviour
+const selectedNodes = computed(() => {
+  return baklava.editor.graph.selectedNodes
+})
+const siedbarVisible = computed(() => {
+  return editor.graph.sidebar.visible
+})
+watch(selectedNodes, (newSel) => {
+  if (newSel.length === 0) {
+    editor.graph.sidebar.nodeId = ''
+    editor.graph.sidebar.visible = false
+  }
+})
+watch(siedbarVisible, (isVisible) => {
+  if (!isVisible) {
+    editor.graph.sidebar.nodeId = ''
+  }
+})
+function handleSelect(id: string) {
+  if (id === editor.graph.sidebar.nodeId && editor.graph.sidebar.visible) return
+  editor.graph.sidebar.nodeId = id
+  editor.graph.sidebar.visible = true
+}
 /**
  * Wrapper für Speichern+Rename:
  * - Wenn der Benutzer im Rename-Input einen neuen, gültigen Namen eingetragen hat,
@@ -241,29 +264,36 @@ function onSelectChange(name: string) {
   <baklava-editor :view-model="baklava" :class="running ? 'is-running' : 'not-running'">
     <template #toolbar>
       <EditorToolbar>
-        <template #custom>
+        <template #start>
           <!-- Settings -->
           <button
             class="baklava-toolbar-button"
             @click="settings.palette.enabled = !settings.palette.enabled"
           >
-            Panel {{ settings.palette.enabled }}
+            Panel {{ settings.palette.enabled ? '⬅️' : '➡️' }}
           </button>
+        </template>
 
+        <template #end>
           <!-- Save / Reset / Simulation -->
-          <button class="baklava-toolbar-button" @click="handleSave">💾</button>
-          <button class="baklava-toolbar-button" v-if="!running" @click="handleStart">▶️</button>
-          <button class="baklava-toolbar-button green" v-if="running" @click="handleStop">
+          <button class="baklava-toolbar-button" title="Save current graph" @click="handleSave">💾</button>
+          <button class="baklava-toolbar-button" title="Start Execution Engine" v-if="!running" @click="handleStart">▶️</button>
+          <button class="baklava-toolbar-button green" title="Stop Execution Engine" v-if="running" @click="handleStop">
             ⏹️
           </button>
-          <button class="baklava-toolbar-button" @click="resetGraph(GRAPH_PREFIX + selectedGraph)">
+          <button class="baklava-toolbar-button" title="Reload current graph" @click="resetGraph(GRAPH_PREFIX + selectedGraph)">
             ↩️
           </button>
+
+          <!-- Nav -->
+          <button class="baklava-toolbar-button" title="Dashboard" @click="router.push('/')">🏡</button>
 
           <!-- Load -->
           <select
             v-model="selectedGraph"
+            v-if="availableGraphs.length > 0"
             class="baklava-toolbar-select"
+            title="Change graph"
             @change="onSelectChange(selectedGraph)"
           >
             <option v-for="name in availableGraphs" :key="name" :value="name">{{ name }}</option>
@@ -273,31 +303,32 @@ function onSelectChange(name: string) {
           <input
             :disabled="isRootSelected"
             v-model="renameGraphName"
-            placeholder="rename to…"
+            placeholder="rename graph to…"
             class="baklava-toolbar-input"
           />
 
           <!-- Create -->
           <input v-model="newGraphName" placeholder="Add new graph" class="baklava-toolbar-input" />
-          <button class="baklava-toolbar-button" :disabled="!canCreate" @click="createNew">
+          <button v-if="newGraphName.length >= 3" class="baklava-toolbar-button" :disabled="!canCreate" @click="createNew">
             ✚ Create
           </button>
 
           <!-- Delete -->
-          <button class="baklava-toolbar-button" v-if="canDelete" @click="deleteGraph">🗑️</button>
+          <button class="baklava-toolbar-button" title="Delete graph" v-if="canDelete" @click="deleteGraph">🗑️</button>
 
-          <!-- Nav -->
-          <button class="baklava-toolbar-button" @click="router.push('/')">🏡</button>
+          <section class="toolbar-meta" title="Graph Meta Data">
+            <!-- Misc Info -->
+            <span class="me-2">Nodes: {{ editor.graph.nodes.length }}</span>
+            <span class="me-2">Connections: {{ editor.graph.connections.length }}</span>
 
-          <!-- Misc Info -->
-          <p class="p-0 mb-0 me-2">Nodes: {{ editor.graph.nodes.length }}</p>
-          <p class="p-0 mb-0 me-2">Connections: {{ editor.graph.connections.length }}</p>
-
-          <!-- Scaling and position -->
-          <p class="p-0 mb-0 me-2">Scale: {{ editor.graph.scaling.toFixed(2) }}</p>
-          <button class="baklava-toolbar-button" @click="editor.graph.scaling = 1">Set to 1</button>
-          <p class="p-0 mb-0 me-2">x: {{ editor.graph.panning.x.toFixed(2) }}</p>
-          <p class="p-0 mb-0 me-2">y: {{ editor.graph.panning.y.toFixed(2) }}</p>
+            <!-- Scaling and position -->
+            <p class="p-0 mb-0 me-2">
+              <span class="me-2">Scale: {{ editor.graph.scaling.toFixed(2) }}</span>
+              <span class="baklava-toolbar-button" @click="editor.graph.scaling = 1">Set to 1</span>
+            </p>
+            <span class="me-2">x: {{ editor.graph.panning.x.toFixed(2) }}</span>
+            <span class="me-2">y: {{ editor.graph.panning.y.toFixed(2) }}</span>
+          </section>
         </template>
       </EditorToolbar>
     </template>
@@ -306,7 +337,11 @@ function onSelectChange(name: string) {
       <Components.Node
         :key="nodeProps.node.id"
         v-bind="nodeProps"
-        :class="(nodeProps.node as AbstractNode).inputs.type?.value ?? nodeProps.node.type"
+        @dblclick="handleSelect(nodeProps.node.id)"
+        :class="[
+          (nodeProps.node as AbstractNode).inputs.type?.value ?? nodeProps.node.type,
+          nodeProps.node.id === editor.graph.sidebar.nodeId ? '--in-sidebar' : '',
+        ]"
       />
     </template>
 
@@ -318,12 +353,8 @@ function onSelectChange(name: string) {
 
 <style>
 #app-main .baklava-node {
-  border: 1px solid rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.6);
   box-shadow: 0 0 5px 0px rgba(0, 0, 0, 0.2);
-}
-
-#app-main .baklava-node > .__title {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.85);
 }
 
 #app-main .baklava-select > .__selected,
@@ -334,9 +365,21 @@ function onSelectChange(name: string) {
   box-shadow: inset 1px 1px 3px 0px rgba(0, 0, 0, 0.5);
 }
 
-#app-main .baklava-node.--selected,
 #app-main .baklava-node:hover {
-  border-color: rgba(0, 0, 0, 0.401);
+  box-shadow: 0 0 15px 3px rgba(119, 255, 0, 0.6);
+}
+
+#app-main .baklava-node.--selected.--dragging {
+  box-shadow: 0 0 25px 3px rgba(255, 238, 0, 0.6);
+}
+
+#app-main .baklava-node.--selected {
+  border: 1px solid rgb(137, 255, 34);
+}
+
+#app-main .baklava-node.--in-sidebar {
+  border: 1px solid rgb(0, 22, 59);
+  box-shadow: 0 0 15px 3px rgba(22, 162, 255, 0.777);
 }
 
 #app-main .baklava-slider > .__slider {
@@ -347,35 +390,40 @@ function onSelectChange(name: string) {
   column-gap: 25px;
 }
 
-.baklava-node.ActorNode,
-.baklava-node.PlayerNode,
-.baklava-node.UserNode {
+.baklava-node.EntityNode > .__title {
+  background-color: rgba(104, 104, 104, 0.4);
+}
+
+.baklava-node.ActorNode > .__title,
+.baklava-node.PlayerNode > .__title,
+.baklava-node.UserNode > .__title,
+.baklava-node.ComponentNode > .__title {
   background-color: rgba(52, 140, 217, 0.6);
 }
 
-.baklava-node.TestStepNode,
-.baklava-node.TestNode {
+.baklava-node.TestStepNode > .__title,
+.baklava-node.TestNode > .__title {
   background-color: rgba(10, 137, 17, 0.4);
 }
-.baklava-node.ActivityNode,
-.baklava-node.TaskNode,
-.baklava-node.FunctionNode,
-.baklava-node.ComponentNode {
+.baklava-node.ActivityNode > .__title,
+.baklava-node.TaskNode > .__title,
+.baklava-node.FunctionNode > .__title {
   background-color: rgba(255, 237, 34, 0.4);
 }
 
-.baklava-node.SceneNode {
-  background-color: rgba(70, 18, 116, 0.4);
+.baklava-node.ContainerNode > .__title,
+.baklava-node.SceneNode > .__title {
+  background-color: rgba(117, 51, 175, 0.4);
 }
 
-.baklava-node.EventNode {
+.baklava-node.EventNode > .__title {
   background-color: rgba(0, 204, 255, 0.6);
 }
 
-.baklava-node.JobToBeDoneNode,
-.baklava-node.StockNode,
-.baklava-node.EngineNode,
-.baklava-node.SystemNode {
+.baklava-node.JobToBeDoneNode > .__title,
+.baklava-node.StockNode > .__title,
+.baklava-node.EngineNode > .__title,
+.baklava-node.SystemNode > .__title {
   background-color: rgba(255, 166, 0, 0.4);
 }
 
@@ -397,7 +445,7 @@ function onSelectChange(name: string) {
   position: absolute;
 }
 .baklava-node-palette {
-  padding: 0rem 1rem 0 1rem;
+  padding: 1rem 1rem 0 1rem;
 }
 .baklava-node-palette h1 {
   margin-top: 0;
@@ -405,6 +453,9 @@ function onSelectChange(name: string) {
 }
 .baklava-toolbar {
   padding: 0.5rem;
+}
+.toolbar-meta {
+  font-size: 9px;
 }
 .baklava-toolbar-select {
   margin-right: 0.5rem;

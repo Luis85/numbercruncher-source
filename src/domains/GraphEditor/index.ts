@@ -33,6 +33,7 @@ export interface BasicNodeInputPorts {
 export interface BasicNodeOutputPorts {
   children: string
   outputs: NodeOutput
+  view: NodeOutput
 }
 
 export interface BasicNodeViewModel {
@@ -88,6 +89,7 @@ export interface NodeOutput {
   opacity: number
   visible: boolean
   values: NodeInput[]
+  options: NodeOptionConfiguration[]
 }
 export interface NodeInput {
   type: string

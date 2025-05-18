@@ -25,7 +25,7 @@ export const BASIC_DYNAMIC_NODE_CONFIG = {
 
   onCreate() {
     const node = this as unknown as AbstractNode
-    node.width = 650
+    node.width = 800
     node.twoColumn = true
   },
 
@@ -172,6 +172,7 @@ export const BASIC_DYNAMIC_NODE_CONFIG = {
       opacity: 1,
       visible: true,
       values: [],
+      options: [],
     }
 
     // add the selected tags
@@ -219,14 +220,8 @@ export const BASIC_DYNAMIC_NODE_CONFIG = {
       if (!option.type || !option.name) continue
       const optionInput = node.inputs[toPascalCase(option.name)]
       if (!optionInput) continue
-
-      const optionValue = optionInput.value ?? option.default
-      nodeOutput.values.push({
-        type: option.type,
-        name: toPascalCase(option.name),
-        label: option.label ?? option.name,
-        value: optionValue,
-      })
+      option.value = optionInput.value
+      nodeOutput.options.push(option)
     }
 
     /**
@@ -260,6 +255,7 @@ export const BASIC_DYNAMIC_NODE_CONFIG = {
     return {
       children: node.id,
       outputs: nodeOutput,
+      view: nodeOutput,
     }
   },
 }

@@ -276,17 +276,37 @@ function onSelectChange(name: string) {
 
         <template #end>
           <!-- Save / Reset / Simulation -->
-          <button class="baklava-toolbar-button" title="Save current graph" @click="handleSave">💾</button>
-          <button class="baklava-toolbar-button" title="Start Execution Engine" v-if="!running" @click="handleStart">▶️</button>
-          <button class="baklava-toolbar-button green" title="Stop Execution Engine" v-if="running" @click="handleStop">
+          <button class="baklava-toolbar-button" title="Save current graph" @click="handleSave">
+            💾
+          </button>
+          <button
+            class="baklava-toolbar-button"
+            title="Start Execution Engine"
+            v-if="!running"
+            @click="handleStart"
+          >
+            ▶️
+          </button>
+          <button
+            class="baklava-toolbar-button green"
+            title="Stop Execution Engine"
+            v-if="running"
+            @click="handleStop"
+          >
             ⏹️
           </button>
-          <button class="baklava-toolbar-button" title="Reload current graph" @click="resetGraph(GRAPH_PREFIX + selectedGraph)">
+          <button
+            class="baklava-toolbar-button"
+            title="Reload current graph"
+            @click="resetGraph(GRAPH_PREFIX + selectedGraph)"
+          >
             ↩️
           </button>
 
           <!-- Nav -->
-          <button class="baklava-toolbar-button" title="Dashboard" @click="router.push('/')">🏡</button>
+          <button class="baklava-toolbar-button" title="Dashboard" @click="router.push('/')">
+            🏡
+          </button>
 
           <!-- Load -->
           <select
@@ -309,12 +329,24 @@ function onSelectChange(name: string) {
 
           <!-- Create -->
           <input v-model="newGraphName" placeholder="Add new graph" class="baklava-toolbar-input" />
-          <button v-if="newGraphName.length >= 3" class="baklava-toolbar-button" :disabled="!canCreate" @click="createNew">
+          <button
+            v-if="newGraphName.length >= 3"
+            class="baklava-toolbar-button"
+            :disabled="!canCreate"
+            @click="createNew"
+          >
             ✚ Create
           </button>
 
           <!-- Delete -->
-          <button class="baklava-toolbar-button" title="Delete graph" v-if="canDelete" @click="deleteGraph">🗑️</button>
+          <button
+            class="baklava-toolbar-button"
+            title="Delete graph"
+            v-if="canDelete"
+            @click="deleteGraph"
+          >
+            🗑️
+          </button>
 
           <section class="toolbar-meta" title="Graph Meta Data">
             <!-- Misc Info -->
@@ -397,6 +429,7 @@ function onSelectChange(name: string) {
 .baklava-node.ActorNode > .__title,
 .baklava-node.PlayerNode > .__title,
 .baklava-node.UserNode > .__title,
+.baklava-node.UseCaseNode > .__title,
 .baklava-node.ComponentNode > .__title {
   background-color: rgba(52, 140, 217, 0.6);
 }
@@ -411,6 +444,7 @@ function onSelectChange(name: string) {
   background-color: rgba(255, 237, 34, 0.4);
 }
 
+.baklava-node.UserInterfaceNode > .__title,
 .baklava-node.ContainerNode > .__title,
 .baklava-node.SceneNode > .__title {
   background-color: rgba(117, 51, 175, 0.4);

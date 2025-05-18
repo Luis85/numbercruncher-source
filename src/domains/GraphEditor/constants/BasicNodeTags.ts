@@ -1,4 +1,6 @@
 export const BASIC_NODE_TAGS = [
+  'Problemspace',
+  'Solutionspace',
   'External',
   'Vendor',
   'Supplier',

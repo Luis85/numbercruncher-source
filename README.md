@@ -61,7 +61,7 @@ For any issues, bugs or feedback, please use the following links:
 
 ## Features
 
-- [ ] Task and habit tracking with a pomoporo tracker
+- [ ] Task and habit tracking with a pomodoro tracker
 - [ ] Requirements Engineering Essentials
 - [ ] Project Management Essentials
 - [ ] System Design Essentials

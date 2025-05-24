@@ -16,6 +16,7 @@ const emit = defineEmits<{
   (e: 'openSidebar'): void
 }>()
 
+const meta = ref(false)
 const debug = ref(false)
 
 const complexity = computed(() => {
@@ -24,16 +25,24 @@ const complexity = computed(() => {
   )
   return metric ? metric.value : 0
 })
+
+const components = computed(() => {
+  const metric = props.node.outputs.outputs.value.values.filter(
+    (item) => item.type === 'Component',
+  )
+  return metric.length
+})
 </script>
 
 <template>
   <section class="mb-3">
+    <button @click="meta = !meta">{{ meta ? 'Hide meta' : 'Show meta' }}</button>
     <button @click="debug = !debug">{{ debug ? 'Hide input' : 'Show input' }}</button>
     <button @click="emit('openSidebar')">Edit node</button>
     <button @click="console.log({ ...modelValue })">Log input state</button>
   </section>
 
-  <section class="mb-3">
+  <section v-if="meta" class="mb-3">
     <p class="mb-1"><strong>Id:</strong> {{ modelValue.id }}</p>
     <p class="mb-1"><strong>Type:</strong> {{ modelValue.type }}</p>
     <p class="mb-1"><strong>View:</strong> {{ modelValue.view }}</p>
@@ -56,6 +65,8 @@ const complexity = computed(() => {
     <p class="mb-0 p-0"><strong>Provided Inputs</strong></p>
     <pre>{{ modelValue }}</pre>
   </section>
+
+  <p v-if="components > 0" class="mb-0 p-0"><strong>Components</strong></p>
 </template>
 
 <style scoped></style>

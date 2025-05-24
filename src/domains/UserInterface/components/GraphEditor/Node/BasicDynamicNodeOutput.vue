@@ -2,11 +2,11 @@
 import { type NodeOutput } from '@/domains/GraphEditor'
 import type { NodeInterface } from 'baklavajs'
 import type { BasicNode as BasicNodeNodeConstructor } from '@/domains/GraphEditor/nodes/Basics/BasicDynamicNode'
-import { ref } from 'vue'
+import { computed, defineAsyncComponent, ref } from 'vue'
 
 type BasicNode = InstanceType<typeof BasicNodeNodeConstructor>
 
-defineProps<{
+const props = defineProps<{
   modelValue: NodeOutput
   node: BasicNode
   intf: NodeInterface<NodeOutput>
@@ -17,6 +17,15 @@ defineEmits<{
 }>()
 
 const debug = ref(false)
+const type = computed(() => props.modelValue.type)
+
+const componentMap: Record<string, unknown> = {
+  ViewNode: defineAsyncComponent(() => import('./ViewNodeOutput.vue')),
+}
+const DynamicComponent = computed(() => {
+  return componentMap[type.value] || null
+})
+
 </script>
 
 <template>
@@ -24,10 +33,15 @@ const debug = ref(false)
     <button @click="debug = !debug">{{ debug ? 'Hide output' : 'Show output' }}</button>
   </section>
 
+  <section v-if="DynamicComponent" class="mb-3 text-start">
+    <component :is="DynamicComponent" :data="modelValue" />
+  </section>
+
   <section v-if="debug" class="mb-3 text-start">
-    <p class="mb-0 p-0"><strong>Calculated Output</strong></p>
+    <p class="mb-0 p-0"><strong>Debug</strong></p>
     <pre>{{ modelValue }}</pre>
   </section>
+
 </template>
 
 <style scoped></style>

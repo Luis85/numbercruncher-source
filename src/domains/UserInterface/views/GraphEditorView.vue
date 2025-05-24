@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, computed, watch } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
 import router from '../router/index.ts'
 
 import { BaklavaEditor, useBaklava, Components, Commands } from '@baklavajs/renderer-vue'
@@ -24,7 +24,6 @@ const GRAPH_PREFIX = 'numbercruncher_graph_'
 const ROOT_NAME = 'root'
 const running = ref(false)
 let step: number = 0
-let ticker: number | null = null
 
 // Liste aller gespeicherten Graph-IDs (ohne Prefix)
 const availableGraphs = ref<string[]>([])
@@ -73,7 +72,6 @@ engine.events.afterRun.subscribe(Symbol(), (result) => {
   engine.pause()
   applyResult(result, editor)
   engine.resume()
-  step++
 })
 
 // Computed für Disable-Zustände
@@ -222,24 +220,15 @@ onMounted(() => {
   loadGraph(GRAPH_PREFIX + ROOT_NAME)
 })
 
-onBeforeUnmount(() => {
-  if (ticker !== null) clearInterval(ticker)
-})
-
 // Graph Execution
 function handleStart() {
-  if (ticker === null) {
-    running.value = true
-    ticker = window.setInterval(() => engine.runOnce({ step }), 1000)
-  }
+  engine.start()
+  running.value = true
 }
 function handleStop() {
-  if (ticker !== null) {
-    clearInterval(ticker)
-    ticker = null
-    running.value = false
-    step = 0
-  }
+  engine.stop()
+  running.value = false
+  step = 0
 }
 
 // Aktionen aus den Feldern
@@ -422,15 +411,15 @@ function onSelectChange(name: string) {
   column-gap: 25px;
 }
 
-.baklava-node.EntityNode > .__title {
+.baklava-node.EntityNode > .__title,
+.baklava-node.ComponentNode > .__title {
   background-color: rgba(104, 104, 104, 0.4);
 }
 
 .baklava-node.ActorNode > .__title,
 .baklava-node.PlayerNode > .__title,
 .baklava-node.UserNode > .__title,
-.baklava-node.UseCaseNode > .__title,
-.baklava-node.ComponentNode > .__title {
+.baklava-node.UseCaseNode > .__title {
   background-color: rgba(52, 140, 217, 0.6);
 }
 
@@ -444,6 +433,7 @@ function onSelectChange(name: string) {
   background-color: rgba(255, 237, 34, 0.4);
 }
 
+.baklava-node.ViewNode > .__title,
 .baklava-node.UserInterfaceNode > .__title,
 .baklava-node.ContainerNode > .__title,
 .baklava-node.SceneNode > .__title {

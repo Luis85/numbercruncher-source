@@ -4,7 +4,7 @@ import type {
   Display2dRendererSceneConfig,
   Display2dRendererState,
 } from '@/domains/GraphEditor/nodes/Display'
-import type { Display2dNode } from '@/domains/GraphEditor/nodes/Display/Display2dNode'
+import type { GameEngineNode } from '@/domains/GraphEditor/nodes/Display/GameEngineNode'
 import { Actor, Color, Engine, PointerScope, Scene, vec, Vector, type ActorArgs } from 'excalibur'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { NodeInterface, useGraph } from 'baklavajs'
@@ -15,7 +15,7 @@ import { ActorWanderBehaviourComponent } from '@/domains/ExcaliburJs/components/
 import { BasicScene } from '@/domains/ExcaliburJs/scenes/BasicScene'
 const props = defineProps<{
   modelValue: Display2dRendererState
-  node: Display2dNode
+  node: GameEngineNode
   intf: NodeInterface<Display2dRendererState>
 }>()
 

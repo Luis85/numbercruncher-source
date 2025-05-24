@@ -10,7 +10,7 @@ import '@baklavajs/themes/dist/syrup-dark.css'
 import { BasicNode } from '@/domains/GraphEditor/nodes/Basics/BasicDynamicNode.ts'
 import { NoteNode } from '@/domains/GraphEditor/nodes/Basics/NoteNode.ts'
 import { TaskNode } from '@/domains/GraphEditor/nodes/Basics/TaskNode.ts'
-import { Display2dNode } from '@/domains/GraphEditor/nodes/Display/Display2dNode.ts'
+import { GameEngineNode } from '@/domains/GraphEditor/nodes/Display/GameEngineNode.ts'
 
 import EditorToolbar from '@/domains/UserInterface/components/GraphEditor/Toolbar/EditorToolbar.vue'
 import CustomSidebar from '../components/GraphEditor/Sidebar/CustomSidebar.vue'
@@ -63,7 +63,7 @@ settings.contextMenu.additionalItems = [
 editor.registerNodeType(BasicNode)
 editor.registerNodeType(NoteNode)
 editor.registerNodeType(TaskNode)
-editor.registerNodeType(Display2dNode, { category: 'Display' })
+editor.registerNodeType(GameEngineNode, { category: 'Display' })
 
 // add global values
 engine.hooks.gatherCalculationData.subscribe(Symbol(), () => ({ step }))

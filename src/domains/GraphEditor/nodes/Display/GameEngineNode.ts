@@ -10,12 +10,12 @@ import { markRaw } from 'vue'
 import Display2dRenderer from '@/domains/UserInterface/components/GraphEditor/Renderer/Display2dRenderer.vue'
 import { DISPLAY2D_EMPTY_STATE } from '../../constants/Display2dEmptyState'
 
-export class Display2dNode extends Node<Display2dInputs, Display2dOutputs> {
-  public type = 'Display2dNode'
+export class GameEngineNode extends Node<Display2dInputs, Display2dOutputs> {
+  public type = 'GameEngineNode'
 
   public constructor() {
     super()
-    this.title = '💻Display 2d'
+    this.title = '💻Game Engine 2d'
     this.width = 850
     this.twoColumn = false
     this.initializeIo()

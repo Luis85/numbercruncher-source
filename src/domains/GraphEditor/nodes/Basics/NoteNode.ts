@@ -1,13 +1,23 @@
-import { defineNode, AbstractNode, TextareaInputInterface } from 'baklavajs'
+import { defineNode, AbstractNode, TextareaInputInterface, NodeInterface } from 'baklavajs'
 
 export const NoteNode = defineNode({
   type: 'NoteNode',
   title: '📑New Note',
   inputs: {
-    text: () => new TextareaInputInterface('Note', '').setPort(false),
+    parent: () => new NodeInterface('Parent', ''),
+    text: () => new TextareaInputInterface('Description', '').setPort(false),
+  },
+  outputs: {
+    children: () => new NodeInterface('Children', ''),
+  },
+  calculate() {
+    const node = this as unknown as AbstractNode
+    return {
+      children: node.id,
+    }
   },
   onCreate() {
     const node = this as unknown as AbstractNode
-    node.width = 300
+    node.width = 450
   },
 })

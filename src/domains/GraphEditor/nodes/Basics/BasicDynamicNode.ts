@@ -25,7 +25,7 @@ export const BASIC_DYNAMIC_NODE_CONFIG = {
 
   onCreate() {
     const node = this as unknown as AbstractNode
-    node.width = 800
+    node.width = 850
     node.twoColumn = true
   },
 

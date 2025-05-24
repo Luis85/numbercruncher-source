@@ -87,17 +87,17 @@ export const BASIC_NODE_INPUTS = {
       .use(displayInSidebar, true)
       .setComponent(markRaw(SidebarOptions))
       .setPort(false),
-  exports: () =>
-    new NodeInterface<SidebarOption[]>('Output Composer', [])
-      .setHidden(true)
-      .use(displayInSidebar, true)
-      .setComponent(markRaw(SidebarOutputComposer))
-      .setPort(false),
   components: () =>
     new NodeInterface<string[]>('Components', [])
       .setHidden(true)
       .use(displayInSidebar, true)
       .setComponent(markRaw(SidebarComponents))
+      .setPort(false),
+  exports: () =>
+    new NodeInterface<SidebarOption[]>('Output Composer', [])
+      .setHidden(true)
+      .use(displayInSidebar, true)
+      .setComponent(markRaw(SidebarOutputComposer))
       .setPort(false),
 
   /**

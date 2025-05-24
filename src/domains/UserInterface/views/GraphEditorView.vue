@@ -407,6 +407,21 @@ function onSelectChange(name: string) {
   background-color: hsla(160, 100%, 37%, 1);
 }
 
+#app-main .baklava-node.ViewNode.--two-column > .__content {
+  grid-template-columns: minmax(0,30%) 1fr;
+  grid-auto-rows: auto;
+}
+
+#app-main .baklava-node.ViewNode.--two-column > .__content > .__inputs {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+#app-main .baklava-node.ViewNode.--two-column > .__content > .__outputs {
+  grid-row: 1;
+  grid-column: 2;
+}
+
 #app-main .baklava-node.--two-column > .__content {
   column-gap: 25px;
 }

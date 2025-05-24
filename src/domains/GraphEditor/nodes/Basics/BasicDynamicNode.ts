@@ -63,24 +63,27 @@ export const BASIC_DYNAMIC_NODE_CONFIG = {
 
       switch (dynamicInput.type) {
         case 'string':
-          dynamic[key] = () => new TextInputInterface(key, typeof value === 'string' ? value : '')
+          dynamic[key] = () =>
+            new TextInputInterface(key, typeof value === 'string' ? value : '').setPort(false)
           break
 
         case 'number':
-          dynamic[key] = () => new NumberInterface(key, typeof value === 'number' ? value : 0)
+          dynamic[key] = () =>
+            new NumberInterface(key, typeof value === 'number' ? value : 0).setPort(false)
           break
 
         case 'boolean':
-          dynamic[key] = () => new SelectInterface(key, String(value || false), ['true', 'false'])
+          dynamic[key] = () =>
+            new SelectInterface(key, String(value || false), ['true', 'false']).setPort(false)
           break
 
         case 'list':
-          dynamic[key] = () => new SelectInterface(key, String(value ?? ''), [])
+          dynamic[key] = () => new SelectInterface(key, String(value ?? ''), []).setPort(false)
           break
 
         default:
           // Fallback: rudimentärer String-Editor
-          dynamic[key] = () => new TextInputInterface(key, String(value ?? ''))
+          dynamic[key] = () => new TextInputInterface(key, String(value ?? '')).setPort(false)
       }
     }
 
@@ -184,14 +187,20 @@ export const BASIC_DYNAMIC_NODE_CONFIG = {
     })
 
     // add the selected components to the output
+    const connectedComponents = inputs.inputs.filter((item) => item.type === 'ComponentNode')
     for (const component of inputs.components) {
       const option = node.inputs[toPascalCase(component)]
       if (!option) continue
+
+      const connectedComponent = connectedComponents.find((item) => item.name === toPascalCase(component))
+      const value = connectedComponent
+        ? JSON.stringify(connectedComponent.options)
+        : String(option.value)
       nodeOutput.values.push({
         type: 'Component',
         name: option.name + 'Component',
         label: option.name,
-        value: option.value,
+        value: value,
       })
     }
 
@@ -204,7 +213,7 @@ export const BASIC_DYNAMIC_NODE_CONFIG = {
 
       const type = input.type === 'ComponentNode' ? 'Component' : 'Export'
       const name = type === 'Component' ? input.name : input.type
-      const value = type === 'Component' ? '' : input.id
+      const value = type === 'Component' ? JSON.stringify(input.options) : input.id
       nodeOutput.values.push({
         type,
         name,

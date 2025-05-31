@@ -192,7 +192,9 @@ export const BASIC_DYNAMIC_NODE_CONFIG = {
       const option = node.inputs[toPascalCase(component)]
       if (!option) continue
 
-      const connectedComponent = connectedComponents.find((item) => item.name === toPascalCase(component))
+      const connectedComponent = connectedComponents.find(
+        (item) => item.name === toPascalCase(component),
+      )
       const value = connectedComponent
         ? JSON.stringify(connectedComponent.options)
         : String(option.value)
@@ -230,6 +232,15 @@ export const BASIC_DYNAMIC_NODE_CONFIG = {
       const optionInput = node.inputs[toPascalCase(option.name)]
       if (!optionInput) continue
       option.value = optionInput.value
+
+      // look if values are provided from upstream components
+      const optionComponentValue = inputs.inputs.find(
+        (item) => item.name.toLowerCase() === option.name,
+      )
+      if (optionComponentValue) {
+        option.value = optionComponentValue.values[0].value
+      }
+
       nodeOutput.options.push(option)
     }
 

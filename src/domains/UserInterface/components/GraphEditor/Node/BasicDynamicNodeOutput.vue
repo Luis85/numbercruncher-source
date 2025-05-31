@@ -29,7 +29,7 @@ const DynamicComponent = computed(() => {
 
 function handleAction(action: string) {
   console.log('handle action: ' + action)
-  events.value.push('player clicked on ' + action)
+  events.value.push('user clicked on ' + action)
 }
 
 function resetEvents() {
@@ -39,18 +39,18 @@ function resetEvents() {
 
 <template>
   <section class="mb-3 text-start">
-     <button @click="resetEvents" :disabled="events.length < 1">↩️</button>
+    <button @click="resetEvents" :disabled="events.length < 1">↩️</button>
     <button @click="debug = !debug">{{ debug ? 'Hide output' : 'Show output' }}</button>
     <button @click="console.log(modelValue)">Log output</button>
   </section>
 
   <section v-if="DynamicComponent" class="mb-3 text-start">
-    <component :is="DynamicComponent" :data="modelValue" @doAction="handleAction" />
-  </section>
-
-  <section v-if="events.length > 0" class="mb-3 text-start">
-    <p class="mb-0 p-0"><strong>Events</strong></p>
-    <pre>{{ events }}</pre>
+    <component
+      :is="DynamicComponent"
+      :data="modelValue"
+      :events="events"
+      @doAction="handleAction"
+    />
   </section>
 
   <section v-if="debug" class="mb-3 text-start">

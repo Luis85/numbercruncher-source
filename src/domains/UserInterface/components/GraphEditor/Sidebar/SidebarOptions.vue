@@ -16,8 +16,10 @@ const options = ref<NodeOptionConfiguration[]>(props.modelValue)
 // When parent changes (e.g. on load), sync in
 watch(
   () => options.value,
-  (options) => {
-    emit('update:modelValue', options)
+  (newValue, oldValue) => {
+    if (newValue === oldValue) return
+
+    emit('update:modelValue', newValue)
   },
   { deep: true },
 )

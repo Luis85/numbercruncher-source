@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type NodeOutput } from '@/domains/GraphEditor'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, defineComponent, onBeforeUnmount, onMounted, ref, type PropType } from 'vue'
 
 interface Field {
   type: string
@@ -11,39 +11,60 @@ interface Field {
 
 const props = defineProps<{
   data: NodeOutput
+  events: string[]
 }>()
 
 const emit = defineEmits<{
   (e: 'doAction', action: string): void
 }>()
 
-const container = ref<HTMLElement|null>(null)
+const container = ref<HTMLElement | null>(null)
+
+onMounted(() => container.value?.addEventListener('click', handleClick))
+onBeforeUnmount(() => container.value?.removeEventListener('click', handleClick))
 
 const layoutComponents = computed(() => {
   return props.data.values
-    .filter((item) => item.type === 'Component')
+    .filter((i) => i.type === 'Component')
     .map((item) => {
+      // Parsen der Felder
       let fields: Field[] = []
       try {
-        fields = item.value ? (JSON.parse(item.value as string) as Field[]) : []
-      } catch (e) {
-        console.warn('Fehler beim Parsen von value JSON:', e)
+        fields = JSON.parse(item.value as string)
+      } catch {
+        console.warn('Invalid JSON', item.value)
       }
 
-      const getField = (n: string) => fields.find((f) => f.name === n)?.value
+      const get = (n: string): string => {
+        const f = fields.find((f) => f.name === n)
+        return f?.value ?? ''
+      }
+      const width = Math.min(Math.max(+get('width') || 1, 1), 6)
+      const order = +get('order') || 0
+      const description = get('description') ?? ''
 
-      // Default auf 1 Spalte und order 0, falls nicht gesetzt
-      const width = parseInt(getField('width') ?? '', 10) || 1
-      const order = parseInt(getField('order') ?? '', 10) || 0
-      const description = getField('description') ?? ''
-      const content = getField('content') ?? ''
+      const tpl = get('content') ?? ''
+      const DynamicComp = defineComponent({
+        props: {
+          eventlog: {
+            type: Array as PropType<string[]>,
+            required: true,
+          },
+        },
+        setup(props) {
+          return {
+            events: props.eventlog,
+          }
+        },
+        template: `<div>${tpl}</div>`,
+      })
 
       return {
         ...item,
         width,
         order,
         description,
-        content,
+        DynamicComp,
       }
     })
     .sort((a, b) => a.order - b.order)
@@ -60,18 +81,10 @@ function handleClick(e: MouseEvent) {
     emit('doAction', action)
   }
 }
-
-onMounted(() => {
-  if (container.value) container.value.addEventListener('click', handleClick)
-})
-onBeforeUnmount(() => {
-  if (container.value) container.value.removeEventListener('click', handleClick)
-})
-
 </script>
 
 <template>
-  <p class="mb-3 p-0"><strong>Calculated Output</strong></p>
+  <p class="mb-3 p-0"><strong>Layout preview</strong></p>
   <div ref="container" class="component-wrapper">
     <section
       v-for="comp in layoutComponents"
@@ -81,7 +94,7 @@ onBeforeUnmount(() => {
     >
       <h4>{{ comp.label }}</h4>
       <p>{{ comp.description }}</p>
-      <div v-html="comp.content"></div>
+      <component :is="comp.DynamicComp" :eventlog="events" />
     </section>
   </div>
 </template>

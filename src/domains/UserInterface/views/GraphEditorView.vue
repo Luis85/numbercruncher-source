@@ -14,6 +14,7 @@ import { GameEngineNode } from '@/domains/GraphEditor/nodes/Display/GameEngineNo
 
 import EditorToolbar from '@/domains/UserInterface/components/GraphEditor/Toolbar/EditorToolbar.vue'
 import CustomSidebar from '../components/GraphEditor/Sidebar/CustomSidebar.vue'
+import { HtmlMarkupNode } from '@/domains/GraphEditor/nodes/Basics/MarkupNode.ts'
 
 const baklava = useBaklava()
 const settings = baklava.settings
@@ -62,6 +63,7 @@ settings.contextMenu.additionalItems = [
 editor.registerNodeType(BasicNode)
 editor.registerNodeType(NoteNode)
 editor.registerNodeType(TaskNode)
+editor.registerNodeType(HtmlMarkupNode, { category: 'Documents' })
 editor.registerNodeType(GameEngineNode, { category: 'Display' })
 
 // add global values
@@ -408,7 +410,7 @@ function onSelectChange(name: string) {
 }
 
 #app-main .baklava-node.ViewNode.--two-column > .__content {
-  grid-template-columns: minmax(0,30%) 1fr;
+  grid-template-columns: minmax(0, 30%) 1fr;
   grid-auto-rows: auto;
 }
 

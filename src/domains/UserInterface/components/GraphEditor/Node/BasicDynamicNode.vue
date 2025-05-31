@@ -46,7 +46,9 @@ const components = computed(() => {
     <p class="mb-1"><strong>View:</strong> {{ modelValue.view }}</p>
     <p class="mb-1"><strong>Emits:</strong> {{ modelValue.emits.length }}</p>
     <p class="mb-1"><strong>Subscribes:</strong> {{ modelValue.subscribes.length }}</p>
-    <p class="mb-1"><strong>Components:</strong> {{ modelValue.components.length + modelValue.options.length}}</p>
+    <p class="mb-1">
+      <strong>Components:</strong> {{ modelValue.components.length + modelValue.options.length }}
+    </p>
     <p class="mb-1"><strong>Complexity:</strong> {{ complexity }}</p>
     <p class="mb-1" v-if="modelValue.tags.length > 0">
       <strong>Tags: </strong>
